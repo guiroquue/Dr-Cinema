@@ -1,17 +1,17 @@
 import { Stack } from "expo-router";
-import TheatreView from "@/src/components/views/theater_view";
+import UpcomingView from "@/src/components/views/upcoming_view";
 
-export default function ContactsScreen() {
+export default function UpcomingScreen() {
   return (
     <>
       <Stack.Screen
         options={{
-          title: "Dr. Cinema",
+          title: "Væntanlegt",
           headerShadowVisible: false,
 
         }}
       />
-      <TheatreView />
+      <UpcomingView />
     </>
   );
 }
