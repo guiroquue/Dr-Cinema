@@ -2,8 +2,6 @@
 
 This repository contains the application for assignment 2 for the App Development course at Reykjavík University. The course covers key topics in modern app development, including React Native, ES6, Expo, development environments, app publishing, Redux, and more. It provides the foundational knowledge and hands-on skills needed to begin building and deploying mobile applications.
 
-The Contactor is a mobile application built with Expo that allows users to manage personal contact information entirely on-device. The app provides functionality for viewing, searching, adding, editing, importing, and calling contacts, while ensuring all contact data is stored persistently in the file system.
-
 ## Table of Contents
 
 - [Project Structure](#project-structure)
@@ -12,8 +10,9 @@ The Contactor is a mobile application built with Expo that allows users to manag
     - [Clone the Repository](#1-clone-the-repository)
     - [Go Into the repository](#2-go-into-the-repository)
     - [Install Depedencies](#3-intall-depedencies)
+    - [Add API Credentials](#4-add-api-credentials)
+    - [Test API](#5-test-api)
 - [Running the Application Guide](#running-the-application-guide)
-- [Tests](#tests)
 - [Primary Development Platform](#primary-development-platform)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
@@ -54,7 +53,7 @@ Install the required depedencies with the node package manager.
 npm install
 ```
 
-## Running the Application Guide
+### 4. Add API Credentials
 
 Before running the app, create an **.env** file in the project root and add your Kvikmyndir API credentials.
 
@@ -69,18 +68,20 @@ EXPO_PUBLIC_KVIKMYNDIR_API_KEY=your_api_key_here
 
 > Note: You can obtain an API key by creating an account at [https://api.kvikmyndir.is] and following their setup instructions.
 
-Run the application with Expo.
-
-```bash
-npm start
-```
-
-## Tests
+### 5. Test API
 
 You can test all endpoints after putting in your API token inside the **.env** file by running:
 
 ```bash
 npm run test-api
+```
+
+## Running the Application Guide
+
+Run the application with Expo.
+
+```bash
+npm start
 ```
 
 ## Primary Development Platform
