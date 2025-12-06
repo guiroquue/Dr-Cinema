@@ -42,7 +42,7 @@ git clone https://github.com/guiroquue/Dr-Cinema.git
 Inside the terminal, travel into the repository.
 
 ```bash
-cd /dr-cinema
+cd Dr-Cinema
 ```
 
 ### 3. Intall Depedencies
