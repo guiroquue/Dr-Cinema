@@ -13,6 +13,7 @@ The Contactor is a mobile application built with Expo that allows users to manag
     - [Go Into the repository](#2-go-into-the-repository)
     - [Install Depedencies](#3-intall-depedencies)
 - [Running the Application Guide](#running-the-application-guide)
+- [Tests](#tests)
 - [Primary Development Platform](#primary-development-platform)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
@@ -34,7 +35,7 @@ The Contactor is a mobile application built with Expo that allows users to manag
 Open your terminal and clone the repository into a desired directory.
 
 ```bash
-git clone
+git clone https://github.com/guiroquue/Dr-Cinema.git
 ```
 
 ### 2. Go Into the Repository
@@ -42,7 +43,7 @@ git clone
 Inside the terminal, travel into the repository.
 
 ```bash
-cd
+cd /dr-cinema
 ```
 
 ### 3. Intall Depedencies
@@ -55,10 +56,31 @@ npm install
 
 ## Running the Application Guide
 
+Before running the app, create an **.env** file in the project root and add your Kvikmyndir API credentials.
+
+You can use **.env.example** as a reference.
+The required structure is:
+
+```bash
+# Kvikmyndir API
+EXPO_PUBLIC_KVIKMYNDIR_BASE_URL=https://api.kvikmyndir.is
+EXPO_PUBLIC_KVIKMYNDIR_API_KEY=your_api_key_here
+```
+
+> Note: You can obtain an API key by creating an account at [https://api.kvikmyndir.is] and following their setup instructions.
+
 Run the application with Expo.
 
 ```bash
 npm start
+```
+
+## Tests
+
+You can test all endpoints after putting in your API token inside the **.env** file by running:
+
+```bash
+npm run test-api
 ```
 
 ## Primary Development Platform
