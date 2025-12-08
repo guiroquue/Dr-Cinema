@@ -1,4 +1,4 @@
-import { fetchTheaters } from "../src/services/theaters_service";
+import { fetchTheaters } from "@/services/theaters_service";
 
 describe("Kvikmyndir API - Theaters Endpoint", () => {
   test("returns theaters list", async () => {

@@ -3,12 +3,12 @@ import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Colors, Fonts } from "@/src/constants/theme";
+import { Colors, Fonts } from "@/constants/theme";
 
-import { HomeButton } from "@/src/components/ui/home/home_buttons"
-import { Footer } from "@/src/components/ui/footer"
+import { HomeButton } from "@/components/ui/home/home_buttons"
+import { Footer } from "@/components/ui/footer"
 
-import PopcornIcon from "@/src/assets/icons/popcorn_icon.svg";
+import PopcornIcon from "@/assets/icons/popcorn_icon.svg";
 
 
 

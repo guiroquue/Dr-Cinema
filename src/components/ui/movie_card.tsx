@@ -1,12 +1,12 @@
 import { useRef } from "react";
 import { Image, StyleSheet, Text, View, Pressable, Animated } from "react-native";
 
-import { Colors, Fonts } from "@/src/constants/theme";
+import { Colors, Fonts } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 
-import type { Movie } from "@/src/types/movie";
+import type { Movie } from "@/types/movie";
 
-import { formatDateIS } from "@/src/utils/date_formatter";
+import { formatDateIS } from "@/utils/date_formatter";
 
 
 

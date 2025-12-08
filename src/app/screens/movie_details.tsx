@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import MovieDetailsView from "@/src/components/views/movie_details_view";
+import MovieDetailsView from "@/components/views/movie_details_view";
 
 export default function UpcomingScreen() {
   return (

@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, Animated, Text, View } from "react-native";
+import { Pressable, StyleSheet, Animated, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRef, useEffect } from "react";
-import { Colors, Fonts } from "@/src/constants/theme";
+import { Colors, Fonts } from "@/constants/theme";
 
 interface Props {
   onPress: () => void;
@@ -19,7 +19,7 @@ export function ScrollToTopButton({ onPress, visible }: Props) {
       duration: 250,
       useNativeDriver: true,
     }).start();
-  }, [visible]);
+  });
 
   const animateIn = () => {
     Animated.spring(scale, {

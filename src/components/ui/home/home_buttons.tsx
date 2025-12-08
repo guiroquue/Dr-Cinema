@@ -1,6 +1,6 @@
 import { Pressable, Text, StyleSheet, Animated } from "react-native";
 import { useRef } from "react";
-import { Colors, Fonts } from "@/src/constants/theme";
+import { Colors, Fonts } from "@/constants/theme";
 
 interface HomeButtonProps {
   title: string;

@@ -1,5 +1,5 @@
 import { Text, StyleSheet } from "react-native";
-import { Colors, Fonts } from "@/src/constants/theme";
+import { Colors, Fonts } from "@/constants/theme";
 
 export function Footer() {
 

@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Colors } from "@/src/constants/theme";
+import { Colors } from "@/constants/theme";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;

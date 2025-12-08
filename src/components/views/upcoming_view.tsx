@@ -6,19 +6,19 @@ import { useRef, useEffect, useState } from "react";
 import { SectionList, StyleSheet, Text } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Colors, Fonts } from "@/src/constants/theme";
+import { Colors, Fonts } from "@/constants/theme";
 
-import { fetchUpcoming } from "@/src/services/upcoming_service";
+import { fetchUpcoming } from "@/services/upcoming_service";
 
-import { MovieCard } from "@/src/components/ui/movie_card";
-import { ScrollToTopButton } from "@/src/components/ui/scroll_to_top_button";
+import { MovieCard } from "@/components/ui/movie_card";
+import { ScrollToTopButton } from "@/components/ui/scroll_to_top_button";
 
-import type { Movie } from "@/src/types/movie";
+import type { Movie } from "@/types/movie";
 
-import { filterUpcoming } from "@/src/utils/filter_upcoming";
-import { dedupeByImdb } from "@/src/utils/movie_dedupe";
-import { sortByReleaseDate } from "@/src/utils/movie_sort";
-import { groupMoviesByMonth } from "@/src/utils/movie_group";
+import { filterUpcoming } from "@/utils/filter_upcoming";
+import { dedupeByImdb } from "@/utils/movie_dedupe";
+import { sortByReleaseDate } from "@/utils/movie_sort";
+import { groupMoviesByMonth } from "@/utils/movie_group";
 
 
 
@@ -77,19 +77,6 @@ export default function UpcomingView() {
             />
 
             <ScrollToTopButton visible={showTopBtn} onPress={scrollToTop} />
-
-            <LinearGradient
-                colors={[theme.background, theme.background + "00"]}
-                style={{
-                position: "absolute",
-                top: 32,
-                left: 0,
-                right: 0,
-                height: 30,
-                zIndex: 10,
-                }}
-                pointerEvents="none"
-            />
 
             <LinearGradient
                 colors={[theme.background + "00", theme.background]}

@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import HomeView from "@/src/components/views/home_view";
+import HomeView from "@/components/views/home_view";
 
 export default function ContactsScreen() {
   return (
