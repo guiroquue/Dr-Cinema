@@ -1,4 +1,4 @@
-import { fetchMovies } from "../src/services/movies_service";
+import { fetchMovies } from "@/services/movies_service";
 
 describe("Kvikmyndir API - Movies Endpoint", () => {
   test("should return movie data successfully", async () => {

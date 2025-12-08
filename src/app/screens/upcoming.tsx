@@ -1,12 +1,12 @@
 import { Stack } from "expo-router";
-import UpcomingView from "@/src/components/views/upcoming_view";
+import UpcomingView from "@/components/views/upcoming_view";
 
 export default function UpcomingScreen() {
   return (
     <>
       <Stack.Screen
         options={{
-          title: "Væntanlegt",
+          title: "Væntanlegt í Bíó",
           headerShadowVisible: false,
 
         }}

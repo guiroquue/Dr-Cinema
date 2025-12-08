@@ -1,4 +1,4 @@
-import { fetchSearch } from "../src/services/search_service";
+import { fetchSearch } from "@/services/search_service";
 
 describe("Kvikmyndir API - Search Endpoint", () => {
 

@@ -1,4 +1,4 @@
-import { fetchImages } from "../src/services/images_service";
+import { fetchImages } from "@/services/images_service";
 
 describe("Kvikmyndir API - Images Endpoint", () => {
   test("returns image results for a valid imdbid", async () => {

@@ -1,4 +1,4 @@
-import { fetchUpcoming } from "../src/services/upcoming_service";
+import { fetchUpcoming } from "@/services/upcoming_service";
 
 describe("Kvikmyndir API - Upcoming Endpoint", () => {
   test("returns upcoming movies", async () => {
