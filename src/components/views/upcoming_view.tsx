@@ -10,6 +10,7 @@ import { Colors, Fonts } from "@/constants/theme";
 
 import { MovieCard } from "@/components/ui/movie_card";
 import { ScrollToTopButton } from "@/components/ui/scroll_to_top_button";
+import NavigationBar from "@/components/ui/nav_bar"
 
 import type { Movie } from "@/types/movie";
 

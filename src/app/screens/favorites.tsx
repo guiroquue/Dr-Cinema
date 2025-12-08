@@ -1,17 +1,17 @@
 import { Stack } from "expo-router";
-import TheatersView from "@/components/views/theaters_view";
+import FavoritesView from "@/components/views/favorites_view";
 
-export default function TheatersScreen() {
+export default function FavoritesScreen() {
   return (
     <>
       <Stack.Screen
         options={{
-          title: "Bíó",
+          title: "",
           headerShadowVisible: false,
           headerBackVisible: false,
         }}
       />
-      <TheatersView />
+      <FavoritesView />
     </>
   );
 }
