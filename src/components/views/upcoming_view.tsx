@@ -8,19 +8,17 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { Colors, Fonts } from "@/constants/theme";
 
-import { fetchUpcoming } from "@/services/upcoming_service";
-
 import { MovieCard } from "@/components/ui/movie_card";
 import { ScrollToTopButton } from "@/components/ui/scroll_to_top_button";
 
 import type { Movie } from "@/types/movie";
 
+import { useAppDispatch, useAppSelector, fetchUpcoming } from "@/store";
+
 import { filterUpcoming } from "@/utils/filter_upcoming";
 import { dedupeByImdb } from "@/utils/movie_dedupe";
 import { sortByReleaseDate } from "@/utils/movie_sort";
 import { groupMoviesByMonth } from "@/utils/movie_group";
-
-
 
 export default function UpcomingView() {
     const listRef = useRef<SectionList<Movie>>(null);
@@ -28,7 +26,11 @@ export default function UpcomingView() {
     const insets = useSafeAreaInsets();
 
     const theme = Colors.default;
-    const [movies, setMovies] = useState<Movie[]>([]);
+    const dispatch = useAppDispatch();
+    const movies = useAppSelector((s) => s.movies.upcoming);
+    const loading = useAppSelector((s) => s.movies.loadingUpcoming);
+    const error = useAppSelector((s) => s.movies.upcomingError);
+
 
     const unreleased = filterUpcoming(movies);
     const unique = dedupeByImdb(unreleased);
@@ -36,62 +38,62 @@ export default function UpcomingView() {
     const sections = groupMoviesByMonth(sorted);
 
     useEffect(() => {
-        fetchUpcoming()
-        .then((data) => {
-            setMovies(data);
-        })
-        .catch(console.error);
-    }, []);
+    if (movies.length === 0) dispatch(fetchUpcoming());
+    }, [dispatch, movies.length]);
+
+
 
     function scrollToTop() {
-        listRef.current?.scrollToLocation({
-            sectionIndex: 0,
-            itemIndex: 0,
-            animated: true,
-        });
+        listRef.current?.scrollToLocation({ sectionIndex: 0, itemIndex: 0, animated: true });
     }
 
-    return (
-        <SafeAreaView edges={['top', 'bottom']} style={[styles.safe, { backgroundColor: theme.background }]}>
-            <SectionList
-            ref={listRef}
-            sections={sections}
-            renderItem={({ item }) => <MovieCard
-            movie={item}
-            onPress={() => router.push(`/screens/movie_details`)}
-            />}
-            keyExtractor={(item, index) => `${item._id}-${index}`}
-            renderSectionHeader={({ section }) => (
-                <Text style={styles.sectionHeader}>{section.title}</Text>
-            )}
-            stickySectionHeadersEnabled={false}
-            contentContainerStyle={{
-                paddingHorizontal: 20,
-                paddingBottom: 126,
-            }}
-            onScroll={(e) => {
-                const y = e.nativeEvent.contentOffset.y;
-                setShowTopBtn(y > 300);
-            }}
-            scrollEventThrottle={16}
-            />
+  return (
+    <SafeAreaView edges={["top", "bottom"]} style={[styles.safe, { backgroundColor: theme.background }]}>
+      {loading && (
+        <Text style={styles.sectionHeader}>Loading…</Text>
+      )}
 
-            <ScrollToTopButton visible={showTopBtn} onPress={scrollToTop} />
+      {!loading && error && (
+        <Text style={styles.sectionHeader}>Error: {error}</Text>
+      )}
 
-            <LinearGradient
-                colors={[theme.background + "00", theme.background]}
-                style={{
-                position: "absolute",
-                bottom: 32,
-                left: 0,
-                right: 0,
-                height: insets.bottom + 100,
-                zIndex: 10,
-                }}
-                pointerEvents="none"
+      {!loading && !error && (
+        <SectionList
+          ref={listRef}
+          sections={sections}
+          renderItem={({ item }) => (
+            <MovieCard
+              movie={item}
+              onPress={() => router.push(`/screens/movie_details`)}
             />
-        </SafeAreaView>
-    );
+          )}
+          keyExtractor={(item, index) => `${item._id}-${index}`}
+          renderSectionHeader={({ section }) => (
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+          )}
+          stickySectionHeadersEnabled={false}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 126 }}
+          onScroll={(e) => setShowTopBtn(e.nativeEvent.contentOffset.y > 300)}
+          scrollEventThrottle={16}
+        />
+      )}
+
+      <ScrollToTopButton visible={showTopBtn} onPress={scrollToTop} />
+
+      <LinearGradient
+        colors={[theme.background + "00", theme.background]}
+        style={{
+          position: "absolute",
+          bottom: 32,
+          left: 0,
+          right: 0,
+          height: insets.bottom + 100,
+          zIndex: 10,
+        }}
+        pointerEvents="none"
+      />
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
