@@ -1,13 +1,39 @@
-import { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { FlatList, Text, Image, View, StyleSheet } from "react-native";
+
+import { router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+
+import { useRef, useEffect, useState } from "react";
+import { SectionList, StyleSheet, Text } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { Colors, Fonts } from "@/src/constants/theme";
+
 import { fetchUpcoming } from "@/src/services/upcoming_service";
-import { Colors } from "@/src/constants/theme";
+
+import { MovieCard } from "@/src/components/ui/movie_card";
+import { ScrollToTopButton } from "@/src/components/ui/scroll_to_top_button";
+
 import type { Movie } from "@/src/types/movie";
 
+import { filterUpcoming } from "@/src/utils/filter_upcoming";
+import { dedupeByImdb } from "@/src/utils/movie_dedupe";
+import { sortByReleaseDate } from "@/src/utils/movie_sort";
+import { groupMoviesByMonth } from "@/src/utils/movie_group";
+
+
+
 export default function UpcomingView() {
+    const listRef = useRef<SectionList<Movie>>(null);
+    const [showTopBtn, setShowTopBtn] = useState(false);
+    const insets = useSafeAreaInsets();
+
     const theme = Colors.default;
     const [movies, setMovies] = useState<Movie[]>([]);
+
+    const unreleased = filterUpcoming(movies);
+    const unique = dedupeByImdb(unreleased);
+    const sorted = sortByReleaseDate(unique);
+    const sections = groupMoviesByMonth(sorted);
 
     useEffect(() => {
         fetchUpcoming()
@@ -17,32 +43,65 @@ export default function UpcomingView() {
         .catch(console.error);
     }, []);
 
+    function scrollToTop() {
+        listRef.current?.scrollToLocation({
+            sectionIndex: 0,
+            itemIndex: 0,
+            animated: true,
+        });
+    }
+
     return (
-        <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-            <FlatList
-                data={movies}
-                keyExtractor={(item) => item._id}
-                renderItem={({ item }) => (
-                <View style={{ marginBottom: 20 }}>
+        <SafeAreaView edges={['top', 'bottom']} style={[styles.safe, { backgroundColor: theme.background }]}>
+            <SectionList
+            ref={listRef}
+            sections={sections}
+            renderItem={({ item }) => <MovieCard
+            movie={item}
+            onPress={() => router.push(`/screens/movie_details`)}
+            />}
+            keyExtractor={(item, index) => `${item._id}-${index}`}
+            renderSectionHeader={({ section }) => (
+                <Text style={styles.sectionHeader}>{section.title}</Text>
+            )}
+            stickySectionHeadersEnabled={false}
+            contentContainerStyle={{
+                paddingHorizontal: 20,
+                paddingBottom: 126,
+            }}
+            onScroll={(e) => {
+                const y = e.nativeEvent.contentOffset.y;
+                setShowTopBtn(y > 300);
+            }}
+            scrollEventThrottle={16}
+            />
 
-                    {/* Poster */}
-                    <Image
-                    source={{ uri: item.poster }}
-                    style={{ width: 120, height: 180, borderRadius: 8 }}
-                    />
+            <ScrollToTopButton visible={showTopBtn} onPress={scrollToTop} />
 
-                    {/* Title + Year */}
-                    <Text style={{ fontSize: 18, fontWeight: "600", marginTop: 8 }}>
-                    {item.title} ({item.year})
-                    </Text>
+            <LinearGradient
+                colors={[theme.background, theme.background + "00"]}
+                style={{
+                position: "absolute",
+                top: 32,
+                left: 0,
+                right: 0,
+                height: 30,
+                zIndex: 10,
+                }}
+                pointerEvents="none"
+            />
 
-                    {/* Optional genres */}
-                    <Text style={{ color: "#777" }}>
-                    {item.genres.map((g) => g.NameEN ?? g.Name).join(", ")}
-                    </Text>
-
-                </View>
-                )}
+            <LinearGradient
+                colors={[theme.background + "00", theme.background]}
+                style={{
+                position: "absolute",
+                bottom: 32,
+                left: 0,
+                right: 0,
+                height: insets.bottom + 100,
+                zIndex: 10,
+                }}
+                pointerEvents="none"
             />
         </SafeAreaView>
     );
@@ -51,8 +110,17 @@ export default function UpcomingView() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 64,
     paddingTop: -24,
+  },
+
+  sectionHeader: {
+    fontSize: 32,
+    fontFamily: Fonts.heading.black,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+    marginTop: 8,
+    marginBottom: 24,
+    color: Colors.default.secondary,
+    backgroundColor: Colors.default.background,
   },
 });

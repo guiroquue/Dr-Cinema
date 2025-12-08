@@ -1,16 +1,17 @@
 import { Stack } from "expo-router";
-import HomeView from "@/src/components/views/home_view";
+import TheatersView from "@/src/components/views/theaters_view";
 
-export default function ContactsScreen() {
+export default function TheatersScreen() {
   return (
     <>
       <Stack.Screen
         options={{
-          title: "",
+          title: "Bíó",
           headerShadowVisible: false,
+
         }}
       />
-      <HomeView />
+      <TheatersView />
     </>
   );
 }

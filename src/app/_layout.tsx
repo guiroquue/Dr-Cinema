@@ -7,6 +7,7 @@ import {
   PlayfairDisplay_500Medium,
   PlayfairDisplay_600SemiBold,
   PlayfairDisplay_700Bold,
+  PlayfairDisplay_900Black,
 } from "@expo-google-fonts/playfair-display";
 
 import {
@@ -21,6 +22,7 @@ export default function RootLayout() {
     PlayfairDisplay_500Medium,
     PlayfairDisplay_600SemiBold,
     PlayfairDisplay_700Bold,
+    PlayfairDisplay_900Black,
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
@@ -40,7 +42,7 @@ export default function RootLayout() {
           backgroundColor: theme.background,
         },
         headerTitleStyle: {
-          color: theme.text,
+          color: theme.secondary,
           fontSize: 20,
           fontFamily: Fonts.heading.semibold,
         },
