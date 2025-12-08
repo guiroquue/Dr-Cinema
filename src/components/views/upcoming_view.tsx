@@ -27,9 +27,9 @@ export default function UpcomingView() {
 
     const theme = Colors.default;
     const dispatch = useAppDispatch();
-    const movies = useAppSelector((s) => s.movies.upcoming);
-    const loading = useAppSelector((s) => s.movies.loadingUpcoming);
-    const error = useAppSelector((s) => s.movies.upcomingError);
+    const movies = useAppSelector((s) => s.upcoming.items);
+    const loading = useAppSelector((s) => s.upcoming.loading);
+    const error = useAppSelector((s) => s.upcoming.error);
 
 
     const unreleased = filterUpcoming(movies);
