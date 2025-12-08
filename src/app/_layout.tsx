@@ -2,6 +2,9 @@ import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { Colors, Fonts } from "@/constants/theme";
 
+import { Provider } from "react-redux";
+import { store } from "@/store";
+
 import {
   PlayfairDisplay_400Regular,
   PlayfairDisplay_500Medium,
@@ -28,25 +31,25 @@ export default function RootLayout() {
     Inter_600SemiBold,
   });
 
-  if (!fontsLoaded) {
-    return null;
-  }
+  if (!fontsLoaded) return null;
 
   const theme = Colors.default;
 
   return (
-    <Stack
-      screenOptions={{
-        headerTitleAlign: "center",
-        headerStyle: {
-          backgroundColor: theme.background,
-        },
-        headerTitleStyle: {
-          color: theme.secondary,
-          fontSize: 20,
-          fontFamily: Fonts.heading.semibold,
-        },
-      }}
-    />
+    <Provider store={store}>
+      <Stack
+        screenOptions={{
+          headerTitleAlign: "center",
+          headerStyle: {
+            backgroundColor: theme.background,
+          },
+          headerTitleStyle: {
+            color: theme.secondary,
+            fontSize: 20,
+            fontFamily: Fonts.heading.semibold,
+          },
+        }}
+      />
+    </Provider>
   );
 }
