@@ -1,18 +1,16 @@
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Colors, Fonts } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 
 import NavigationBar from "@/components/ui/nav_bar"
 
-
-
-export default function HomeView() {
+export default function FavoritesView() {
   const theme = Colors.default;
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      <NavigationBar />
+        <NavigationBar />
     </SafeAreaView>
   );
 }

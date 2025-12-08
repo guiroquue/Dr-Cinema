@@ -12,6 +12,7 @@ import { fetchUpcoming } from "@/services/upcoming_service";
 
 import { MovieCard } from "@/components/ui/movie_card";
 import { ScrollToTopButton } from "@/components/ui/scroll_to_top_button";
+import NavigationBar from "@/components/ui/nav_bar"
 
 import type { Movie } from "@/types/movie";
 
@@ -77,6 +78,7 @@ export default function UpcomingView() {
             />
 
             <ScrollToTopButton visible={showTopBtn} onPress={scrollToTop} />
+            <NavigationBar />
 
             <LinearGradient
                 colors={[theme.background + "00", theme.background]}
@@ -85,7 +87,7 @@ export default function UpcomingView() {
                 bottom: 32,
                 left: 0,
                 right: 0,
-                height: insets.bottom + 100,
+                height: insets.bottom + 120,
                 zIndex: 10,
                 }}
                 pointerEvents="none"
