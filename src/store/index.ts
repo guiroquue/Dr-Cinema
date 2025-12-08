@@ -24,3 +24,10 @@ export {
   clearTheatersError,
   setTheaters,
 } from "./theaters_slice";
+
+export {
+  default as movieDetailsReducer,
+  fetchMovieByImdbId,
+  clearMovieDetails,
+  clearMovieDetailsError,
+} from "./movie_details_slice";

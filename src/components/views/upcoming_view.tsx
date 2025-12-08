@@ -62,10 +62,14 @@ export default function UpcomingView() {
           ref={listRef}
           sections={sections}
           renderItem={({ item }) => (
-            <MovieCard
-              movie={item}
-              onPress={() => router.push(`/screens/movie_details`)}
-            />
+        <MovieCard
+        movie={item}
+        onPress={() => {
+            const imdbId = item.ids.imdb;
+            if (!imdbId) return;
+            router.push({ pathname: "/screens/movie_details", params: { imdbId } });
+        }}
+        />
           )}
           keyExtractor={(item, index) => `${item._id}-${index}`}
           renderSectionHeader={({ section }) => (
