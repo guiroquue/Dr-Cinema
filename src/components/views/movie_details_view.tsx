@@ -4,7 +4,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 
 import { Colors } from "@/constants/theme";
-import { useAppDispatch, useAppSelector, fetchMovieByImdbId } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { loadMovieDetails, clearMovieDetails } from "@/store/upcoming_movie_details_slice";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
@@ -14,38 +15,40 @@ export default function MovieDetailsView() {
 
   const dispatch = useAppDispatch();
 
-  const movie = useAppSelector((s) =>
-    resolvedImdbId ? s.movieDetails.byImdbId[resolvedImdbId] : undefined
-  );
-  const loading = useAppSelector((s) =>
-    resolvedImdbId ? !!s.movieDetails.loadingByImdbId[resolvedImdbId] : false
-  );
-  const error = useAppSelector((s) =>
-    resolvedImdbId ? s.movieDetails.errorByImdbId[resolvedImdbId] : null
-  );
+  const item = useAppSelector((s) => s.movieDetails.item);
+  const loading = useAppSelector((s) => s.movieDetails.loading);
+  const error = useAppSelector((s) => s.movieDetails.error);
 
   useEffect(() => {
     if (!resolvedImdbId) return;
-    if (!movie) dispatch(fetchMovieByImdbId({ imdbId: resolvedImdbId }));
-  }, [dispatch, resolvedImdbId, movie]);
 
-  console.log(movie)
+    dispatch(loadMovieDetails({ imdbId: resolvedImdbId }));
+
+    return () => {
+      dispatch(clearMovieDetails());
+    };
+  }, [dispatch, resolvedImdbId]);
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      {!resolvedImdbId && <Text style={styles.text}>Missing imdbId route param.</Text>}
+      {!resolvedImdbId && (
+        <Text style={styles.text}>Missing imdbId route param.</Text>
+      )}
 
-      {resolvedImdbId && loading && <Text style={styles.text}>Loading…</Text>}
+      {resolvedImdbId && loading && (
+        <Text style={styles.text}>Loading…</Text>
+      )}
 
       {resolvedImdbId && !loading && error && (
         <Text style={styles.text}>Error: {error}</Text>
       )}
 
-      {resolvedImdbId && !loading && !error && movie && (
+      {resolvedImdbId && !loading && !error && item && (
         <View style={{ width: "100%" }}>
-          <Text style={styles.title}>{movie.title}</Text>
-          <Text style={styles.text}>Year: {movie.year}</Text>
-          <Text style={styles.text}>IMDb: {movie.ids?.imdb ?? resolvedImdbId}</Text>
-          {!!movie.plot && <Text style={styles.text}>Plot: {movie.plot}</Text>}
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.text}>Year: {item.year}</Text>
+          <Text style={styles.text}>IMDb: {item.ids?.imdb ?? resolvedImdbId}</Text>
+          {!!item.plot && <Text style={styles.text}>Plot: {item.plot}</Text>}
         </View>
       )}
     </SafeAreaView>

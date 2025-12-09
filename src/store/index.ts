@@ -1,33 +1,16 @@
-export { store } from "./store";
-export type { RootState, AppDispatch } from "./store";
+// src/store/index.ts
+import { configureStore } from "@reduxjs/toolkit";
+import upcomingReducer from "./upcoming_movies_slice";
+import movieDetailsReducer from "./upcoming_movie_details_slice";
 
-export { useAppDispatch, useAppSelector } from "./hooks";
+export const store = configureStore({
+  reducer: {
+    upcoming: upcomingReducer,
+    movieDetails: movieDetailsReducer,
+    // add more slices here as you build them
+  },
+});
 
-export {
-  default as upcomingReducer,
-  fetchUpcoming,
-  clearUpcomingError,
-  setUpcoming,
-} from "./upcoming_slice";
-
-export {
-  default as currentMoviesReducer,
-  fetchCurrentMovies,
-  clearCurrentMoviesError,
-  setCurrentMovies,
-} from "./current_movies_slice";
-
-export {
-  default as theatersReducer,
-  fetchTheaters,
-  fetchTheaterById,
-  clearTheatersError,
-  setTheaters,
-} from "./theaters_slice";
-
-export {
-  default as movieDetailsReducer,
-  fetchMovieByImdbId,
-  clearMovieDetails,
-  clearMovieDetailsError,
-} from "./movie_details_slice";
+// Types
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
