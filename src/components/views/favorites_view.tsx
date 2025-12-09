@@ -29,7 +29,6 @@ export default function FavoritesView() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    alignItems: "center",
     paddingHorizontal: 20,
   },
 });
