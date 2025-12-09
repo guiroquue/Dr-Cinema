@@ -22,6 +22,22 @@ import {
 } from "@expo-google-fonts/inter";
 
 import { useFonts } from "expo-font";
+import { useEffect } from "react";
+import { useAppDispatch } from "@/store/hooks";
+import { setFavorites } from "@/store/favorites_slice";
+import { loadFavorites } from "@/utils/favorite_movies";
+
+export function InitFavorites() {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    loadFavorites().then(saved => {
+      dispatch(setFavorites(saved));
+    });
+  }, []);
+
+  return null;
+}
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({

@@ -6,6 +6,7 @@ import { useLocalSearchParams } from "expo-router";
 import { Colors } from "@/constants/theme";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { loadMovieDetails, clearMovieDetails } from "@/store/upcoming_movie_details_slice";
+import FavoriteButton from "../ui/favorite_button";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
@@ -49,6 +50,8 @@ export default function MovieDetailsView() {
           <Text style={styles.text}>Year: {item.year}</Text>
           <Text style={styles.text}>IMDb: {item.ids?.imdb ?? resolvedImdbId}</Text>
           {!!item.plot && <Text style={styles.text}>Plot: {item.plot}</Text>}
+
+          <FavoriteButton movie={item}/>
         </View>
       )}
     </SafeAreaView>
