@@ -1,10 +1,7 @@
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Colors, Fonts } from "@/constants/theme";
-
-import NavigationBar from "@/components/ui/nav_bar"
-
+import { Colors } from "@/constants/theme";
 
 
 export default function HomeView() {
@@ -12,7 +9,6 @@ export default function HomeView() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      <NavigationBar />
     </SafeAreaView>
   );
 }

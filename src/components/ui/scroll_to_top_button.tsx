@@ -58,7 +58,7 @@ export function ScrollToTopButton({ onPress, visible }: Props) {
         <Text style={styles.label}>Fara efst á síðu</Text>
         <Ionicons
           name="chevron-up-outline"
-          size={22}
+          size={20}
           color={Colors.default.background}
         />
       </Pressable>
@@ -69,7 +69,7 @@ export function ScrollToTopButton({ onPress, visible }: Props) {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 30,
+    bottom: 112,
     right: 20,
     zIndex: 50,
   },
@@ -92,6 +92,6 @@ const styles = StyleSheet.create({
   label: {
     color: Colors.default.primary,
     fontFamily: Fonts.body.semibold,
-    fontSize: 15,
+    fontSize: 12,
   },
 });

@@ -10,7 +10,6 @@ import { Colors, Fonts } from "@/constants/theme";
 
 import { MovieCard } from "@/components/ui/movie_card";
 import { ScrollToTopButton } from "@/components/ui/scroll_to_top_button";
-import NavigationBar from "@/components/ui/nav_bar"
 
 import type { Movie } from "@/types/movie";
 
@@ -83,28 +82,41 @@ export default function UpcomingView() {
         />
       )}
 
-      <ScrollToTopButton visible={showTopBtn} onPress={scrollToTop} />
+            <ScrollToTopButton visible={showTopBtn} onPress={scrollToTop} />
 
-      <LinearGradient
-        colors={[theme.background + "00", theme.background]}
-        style={{
-          position: "absolute",
-          bottom: 32,
-          left: 0,
-          right: 0,
-          height: insets.bottom + 100,
-          zIndex: 10,
-        }}
-        pointerEvents="none"
-      />
-    </SafeAreaView>
-  );
+            <LinearGradient
+                colors={[theme.background + "00", theme.background]}
+                style={{
+                position: "absolute",
+                bottom: 32,
+                left: 0,
+                right: 0,
+                height: insets.bottom + 120,
+                zIndex: 10,
+                }}
+                pointerEvents="none"
+            />
+
+            <LinearGradient
+                colors={[theme.background, theme.background + "00"]}
+                style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: insets.top - 26,
+                zIndex: 10,
+                }}
+                pointerEvents="none"
+            />
+        </SafeAreaView>
+    );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    paddingTop: -24,
+    paddingTop: -58,
   },
 
   sectionHeader: {

@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/theme";
 import { useAppDispatch, useAppSelector, fetchTheaters } from "@/store";
 
-export default function HomeView() {
+export default function TheatersView() {
   const theme = Colors.default;
 
   const dispatch = useAppDispatch();

@@ -3,14 +3,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
 
-import NavigationBar from "@/components/ui/nav_bar"
-
 export default function FavoritesView() {
   const theme = Colors.default;
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-        <NavigationBar />
     </SafeAreaView>
   );
 }
