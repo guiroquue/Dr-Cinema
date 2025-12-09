@@ -12,7 +12,6 @@ import { fetchUpcoming } from "@/services/upcoming_service";
 
 import { MovieCard } from "@/components/ui/movie_card";
 import { ScrollToTopButton } from "@/components/ui/scroll_to_top_button";
-import NavigationBar from "@/components/ui/nav_bar"
 
 import type { Movie } from "@/types/movie";
 
@@ -59,7 +58,7 @@ export default function UpcomingView() {
             sections={sections}
             renderItem={({ item }) => <MovieCard
             movie={item}
-            onPress={() => router.push(`/screens/movie_details`)}
+            onPress={() => router.push(`/movie_details`)}
             />}
             keyExtractor={(item, index) => `${item._id}-${index}`}
             renderSectionHeader={({ section }) => (
@@ -78,7 +77,6 @@ export default function UpcomingView() {
             />
 
             <ScrollToTopButton visible={showTopBtn} onPress={scrollToTop} />
-            <NavigationBar />
 
             <LinearGradient
                 colors={[theme.background + "00", theme.background]}
@@ -92,6 +90,19 @@ export default function UpcomingView() {
                 }}
                 pointerEvents="none"
             />
+
+            <LinearGradient
+                colors={[theme.background, theme.background + "00"]}
+                style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: insets.top - 26,
+                zIndex: 10,
+                }}
+                pointerEvents="none"
+            />
         </SafeAreaView>
     );
 }
@@ -99,7 +110,7 @@ export default function UpcomingView() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    paddingTop: -24,
+    paddingTop: -58,
   },
 
   sectionHeader: {

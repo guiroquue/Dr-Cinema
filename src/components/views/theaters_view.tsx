@@ -1,16 +1,15 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors } from "@/constants/theme";
 
-import NavigationBar from "@/components/ui/nav_bar"
 
-export default function HomeView() {
+export default function TheatersView() {
   const theme = Colors.default;
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      <NavigationBar />
+      <Text>Hello</Text>
     </SafeAreaView>
   );
 }
