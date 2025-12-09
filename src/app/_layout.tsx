@@ -7,10 +7,6 @@ import { Colors, Fonts } from "@/constants/theme";
 import { Provider } from "react-redux";
 import { store } from "@/store";
 
-import { Provider } from "react-redux";
-import { store } from "@/store";
-
-
 import {
   PlayfairDisplay_400Regular,
   PlayfairDisplay_500Medium,
@@ -47,20 +43,6 @@ export default function RootLayout() {
 
   return (
     <Provider store={store}>
-      <Stack
-        screenOptions={{
-          headerTitleAlign: "center",
-          headerStyle: {
-            backgroundColor: theme.background,
-          },
-          headerTitleStyle: {
-            color: theme.secondary,
-            fontSize: 20,
-            fontFamily: Fonts.heading.semibold,
-          },
-        }}
-      />
-    </Provider>
       <Stack
         screenOptions={{
           headerTitleAlign: "center",
@@ -119,5 +101,6 @@ export default function RootLayout() {
           }}
         />
       </Stack>
+    </Provider>
   );
 }

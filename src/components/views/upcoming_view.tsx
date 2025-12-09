@@ -67,7 +67,7 @@ export default function UpcomingView() {
         onPress={() => {
             const imdbId = item.ids.imdb;
             if (!imdbId) return;
-            router.push({ pathname: "/screens/movie_details", params: { imdbId } });
+            router.push({ pathname: "/movie_details", params: { imdbId } });
         }}
         />
           )}
