@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
+import YoutubePlayer from "react-native-youtube-iframe";
 
 import { Colors } from "@/constants/theme";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -77,12 +78,15 @@ export default function MovieDetailsView() {
     return Array.from(unique.values());
   }, [item]);
 
-  const openTrailer = (t: any) => {
-    const url =
-      t.url ||
-      (t.key ? `https://www.youtube.com/watch?v=${encodeURIComponent(t.key)}` : null);
-    if (url) Linking.openURL(url);
-  };
+  const [playingTrailerKey, setPlayingTrailerKey] = useState<string | null>(
+    null
+  );
+
+  const handleStateChange = useCallback((state: string) => {
+    if (state === "ended") {
+      setPlayingTrailerKey(null);
+    }
+  }, []);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
@@ -101,9 +105,9 @@ export default function MovieDetailsView() {
       {resolvedImdbId && !loading && !error && item && (
         <ScrollView
           style={{ width: "100%" }}
-          contentContainerStyle={{ paddingBottom: 32 }}
+          contentContainerStyle={{ flexGrow:1, paddingBottom: 32 }}
         >
-          {/* 🎞 Poster */}
+
           {posterUrl && (
             <Image
               source={{ uri: posterUrl }}
@@ -123,22 +127,26 @@ export default function MovieDetailsView() {
 
           <FavoriteButton movie={item} />
 
-          {/* 🎬 Trailers section */}
           {trailers.length > 0 && (
             <View style={styles.trailersContainer}>
               <Text style={styles.trailersHeader}>Trailers</Text>
+                {trailers.map((t: any) => {
+                  const key = t.key || t.id;
+                  return (
+                    <View key={key} style={{ marginBottom: 12 }}>
+                      {t.type && (
+                        <Text style={styles.trailerText}>{t.name}</Text>
+                      )}
 
-              {trailers.map((t: any) => (
-                <Pressable
-                  key={t.id ?? t.key}
-                  onPress={() => openTrailer(t)}
-                  style={styles.trailerButton}
-                >
-                  <Text style={styles.trailerText}>
-                    {t.name || "Watch trailer"}
-                  </Text>
-                </Pressable>
-              ))}
+                      <YoutubePlayer
+                        height={220}
+                        width={"100%"}
+                        play={false}
+                        videoId={key}
+                      />
+                    </View>
+                  );
+                })}
             </View>
           )}
         </ScrollView>
@@ -196,6 +204,6 @@ const styles = StyleSheet.create({
   trailerText: {
     fontSize: 15,
     fontWeight: "600",
-    color: Colors.default.action,
+    color: Colors.default.secondary,
   },
 });
