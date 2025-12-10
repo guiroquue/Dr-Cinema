@@ -114,7 +114,7 @@ export default function MovieDetailsView() {
 
           <Text style={styles.title}>{item.title}</Text>
           <Text style={styles.text}>Ár: {item.year}</Text>
-   
+
           {!!item.plot && <Text style={styles.text}>Plot: {item.plot}</Text>}
 
           <FavoriteButton movie={item} />
