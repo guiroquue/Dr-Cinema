@@ -1,10 +1,22 @@
-import { useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Image,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
+import YoutubePlayer from "react-native-youtube-iframe";
 
 import { Colors } from "@/constants/theme";
-import { useAppDispatch, useAppSelector, fetchMovieByImdbId } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  loadMovieDetails,
+  clearMovieDetails,
+} from "@/store/upcoming_movie_details_slice";
+import FavoriteButton from "../ui/favorite_button";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
@@ -14,39 +26,122 @@ export default function MovieDetailsView() {
 
   const dispatch = useAppDispatch();
 
-  const movie = useAppSelector((s) =>
-    resolvedImdbId ? s.movieDetails.byImdbId[resolvedImdbId] : undefined
-  );
-  const loading = useAppSelector((s) =>
-    resolvedImdbId ? !!s.movieDetails.loadingByImdbId[resolvedImdbId] : false
-  );
-  const error = useAppSelector((s) =>
-    resolvedImdbId ? s.movieDetails.errorByImdbId[resolvedImdbId] : null
-  );
+  const item = useAppSelector((s) => s.movieDetails.item);
+  const loading = useAppSelector((s) => s.movieDetails.loading);
+  const error = useAppSelector((s) => s.movieDetails.error);
 
   useEffect(() => {
     if (!resolvedImdbId) return;
-    if (!movie) dispatch(fetchMovieByImdbId({ imdbId: resolvedImdbId }));
-  }, [dispatch, resolvedImdbId, movie]);
 
-  console.log(movie)
+    dispatch(loadMovieDetails({ imdbId: resolvedImdbId }));
+
+    return () => {
+      dispatch(clearMovieDetails());
+    };
+  }, [dispatch, resolvedImdbId]);
+
+  const posterUrl = useMemo(() => {
+    if (!item) return null;
+
+    return (
+      item.poster ||
+      item.poster_url ||
+      item.primaryImage ||
+      item.primaryImage?.url ||
+      item.images?.poster ||
+      item.image ||
+      null
+    );
+  }, [item]);
+
+
+  const trailers = useMemo(() => {
+    if (!item?.trailers) return [];
+
+    const allResults = item.trailers.flatMap((t: any) => t.results ?? []);
+
+    const filtered = allResults.filter(
+      (r: any) => r.site === "YouTube" && r.type === "Trailer"
+    );
+
+    const unique = new Map<string, any>();
+    for (const t of filtered) {
+      const key = t.id ?? t.key;
+      if (!key) continue;
+      if (!unique.has(key)) unique.set(key, t);
+    }
+
+    return Array.from(unique.values());
+  }, [item]);
+
+  const [playingTrailerKey, setPlayingTrailerKey] = useState<string | null>(
+    null
+  );
+
+  const handleStateChange = useCallback((state: string) => {
+    if (state === "ended") {
+      setPlayingTrailerKey(null);
+    }
+  }, []);
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      {!resolvedImdbId && <Text style={styles.text}>Missing imdbId route param.</Text>}
+      {!resolvedImdbId && (
+        <Text style={styles.text}>Missing imdbId route param.</Text>
+      )}
 
-      {resolvedImdbId && loading && <Text style={styles.text}>Loading…</Text>}
+      {resolvedImdbId && loading && (
+        <Text style={styles.text}>Loading…</Text>
+      )}
 
       {resolvedImdbId && !loading && error && (
         <Text style={styles.text}>Error: {error}</Text>
       )}
 
-      {resolvedImdbId && !loading && !error && movie && (
-        <View style={{ width: "100%" }}>
-          <Text style={styles.title}>{movie.title}</Text>
-          <Text style={styles.text}>Year: {movie.year}</Text>
-          <Text style={styles.text}>IMDb: {movie.ids?.imdb ?? resolvedImdbId}</Text>
-          {!!movie.plot && <Text style={styles.text}>Plot: {movie.plot}</Text>}
-        </View>
+      {resolvedImdbId && !loading && !error && item && (
+        <ScrollView
+          style={{ width: "100%" }}
+          contentContainerStyle={{ flexGrow:1, paddingBottom: 32 }}
+        >
+
+          {posterUrl && (
+            <Image
+              source={{ uri: posterUrl }}
+              resizeMode="cover"
+              style={styles.poster}
+            />
+          )}
+
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.text}>Ár: {item.year}</Text>
+   
+          {!!item.plot && <Text style={styles.text}>Plot: {item.plot}</Text>}
+
+          <FavoriteButton movie={item} />
+
+          {trailers.length > 0 && (
+            <View style={styles.trailersContainer}>
+              <Text style={styles.trailersHeader}>Trailers</Text>
+                {trailers.map((t: any) => {
+                  const key = t.key || t.id;
+                  return (
+                    <View key={key} style={{ marginBottom: 12 }}>
+                      {t.type && (
+                        <Text style={styles.trailerText}>{t.name}</Text>
+                      )}
+
+                      <YoutubePlayer
+                        height={220}
+                        width={"100%"}
+                        play={false}
+                        videoId={key}
+                      />
+                    </View>
+                  );
+                })}
+            </View>
+          )}
+        </ScrollView>
       )}
     </SafeAreaView>
   );
@@ -55,15 +150,52 @@ export default function MovieDetailsView() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    alignItems: "center",
     paddingHorizontal: 20,
   },
+
+  poster: {
+    width: "100%",
+    height: 450,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+
   title: {
-    fontSize: 22,
-    marginTop: 12,
+    fontSize: 26,
+    fontWeight: "700",
+    paddingHorizontal: 20,
     marginBottom: 8,
   },
+
   text: {
+    paddingHorizontal: 20,
+    marginBottom: 8,
+    fontSize: 16,
+  },
+
+  trailersContainer: {
+    marginTop: 24,
+    paddingHorizontal: 20,
+  },
+
+  trailersHeader: {
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+
+  trailerButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: Colors.default.action,
     marginTop: 8,
+  },
+
+  trailerText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: Colors.default.secondary,
   },
 });

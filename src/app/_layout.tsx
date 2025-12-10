@@ -22,6 +22,23 @@ import {
 } from "@expo-google-fonts/inter";
 
 import { useFonts } from "expo-font";
+import { useEffect } from "react";
+import { useAppDispatch } from "@/store/hooks";
+import { setFavorites } from "@/store/favorites_slice";
+import { loadFavorites } from "@/utils/favorite_movies";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+export function InitFavorites() {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    loadFavorites().then(saved => {
+      dispatch(setFavorites(saved));
+    });
+  }, []);
+
+  return null;
+}
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -30,77 +47,38 @@ export default function RootLayout() {
     PlayfairDisplay_600SemiBold,
     PlayfairDisplay_700Bold,
     PlayfairDisplay_900Black,
-
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
   });
 
   if (!fontsLoaded) return null;
-  if (!fontsLoaded) return null;
 
   const theme = Colors.default;
 
   return (
-    <Provider store={store}>
-      <Stack
-        screenOptions={{
-          headerTitleAlign: "center",
-          headerShadowVisible: false,
-
-          headerStyle: {
-            backgroundColor: theme.background,
-          },
-
-          headerTitleStyle: {
-            color: theme.secondary,
-            fontFamily: Fonts.heading.semibold,
-            fontSize: 22,
-          },
-
-          headerTintColor: theme.secondary,
-
-          headerRight: () => (
-            <Pressable
-              onPress={() => router.push("/favorites")}
-              style={{ paddingLeft: 6}}
-            >
-              <Ionicons
-                name="heart"
-                size={24}
-                color={theme.action}
-                style={{
-                  marginTop: Platform.OS === "ios" ? 1 : 0,
-                }}
-              />
-            </Pressable>
-          ),
-        }}
-      >
-
-        <Stack.Screen
-          name="(tabs)"
-          options={{
-            title: "Dr. Cinema",
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <InitFavorites />
+        <Stack
+          screenOptions={{
+            headerTitleAlign: "center",
+            headerShadowVisible: false,
+            headerStyle: { backgroundColor: theme.background },
+            headerTitleStyle: { color: theme.secondary, fontFamily: Fonts.heading.semibold, fontSize: 22 },
+            headerTintColor: theme.secondary,
+            headerRight: () => (
+              <Pressable onPress={() => router.push("/favorites")} style={{ paddingLeft: 6 }}>
+                <Ionicons name="heart" size={24} color={theme.action} style={{ marginTop: Platform.OS === "ios" ? 1 : 0 }} />
+              </Pressable>
+            ),
           }}
-        />
-
-        <Stack.Screen
-          name="favorites/index"
-          options={{
-            title: "Favorites",
-            headerBackTitle: "Back",
-          }}
-        />
-
-        <Stack.Screen
-          name="movie_details/index"
-          options={{
-            title: "Movie Details",
-            headerBackTitle: "Back",
-          }}
-        />
-      </Stack>
-    </Provider>
+        >
+          <Stack.Screen name="(tabs)" options={{ title: "Dr. Cinema" }} />
+          <Stack.Screen name="favorites/index" options={{ title: "Favorites", headerBackTitle: "Back" }} />
+          <Stack.Screen name="movie_details/index" options={{ title: "Movie Details", headerBackTitle: "Back" }} />
+        </Stack>
+      </Provider>
+    </GestureHandlerRootView>
   );
 }

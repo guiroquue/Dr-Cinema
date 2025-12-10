@@ -8,7 +8,7 @@ export default function UpcomingScreen() {
         options={{
           title: "Movie",
           headerShadowVisible: false,
-
+          headerRight: () => null,
         }}
       />
       <MovieDetailsView />
