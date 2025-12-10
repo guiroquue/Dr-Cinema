@@ -3,8 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Pressable,
-  Linking,
   ScrollView,
   Image,
 } from "react-native";
@@ -42,7 +40,6 @@ export default function MovieDetailsView() {
     };
   }, [dispatch, resolvedImdbId]);
 
-  // 🔍 Normalize poster URL
   const posterUrl = useMemo(() => {
     if (!item) return null;
 
@@ -58,7 +55,6 @@ export default function MovieDetailsView() {
   }, [item]);
 
 
-  // 🔍 Extract trailers from complex structure
   const trailers = useMemo(() => {
     if (!item?.trailers) return [];
 
@@ -116,13 +112,9 @@ export default function MovieDetailsView() {
             />
           )}
 
-          {/* Title + metadata */}
           <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.text}>Year: {item.year}</Text>
-          <Text style={styles.text}>
-            IMDb: {item.ids?.imdb ?? resolvedImdbId}
-          </Text>
-
+          <Text style={styles.text}>Ár: {item.year}</Text>
+   
           {!!item.plot && <Text style={styles.text}>Plot: {item.plot}</Text>}
 
           <FavoriteButton movie={item} />
