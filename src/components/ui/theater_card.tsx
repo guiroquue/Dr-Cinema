@@ -1,13 +1,11 @@
+// CinemaList.tsx
 import React, { useMemo } from "react";
 import { FlatList, Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors, Fonts } from "@/constants/theme";
+import { useRouter } from "expo-router";
 
-export interface Theater {
-  id: number;
-  name: string;
-  website?: string | null;
-}
+import type { Theater } from "@/types/theatre";
 
 function normalizeWebsite(url?: string | null) {
   const trimmed = (url ?? "").trim();
@@ -20,9 +18,7 @@ async function openUrl(url: string) {
   try {
     const can = await Linking.canOpenURL(url);
     if (can) await Linking.openURL(url);
-  } catch {
-    // no-op
-  }
+  } catch {}
 }
 
 type CinemaListProps = {
@@ -30,6 +26,8 @@ type CinemaListProps = {
 };
 
 export function CinemaList({ theaters }: CinemaListProps) {
+  const router = useRouter();
+
   const data = useMemo(() => {
     return [...theaters].sort((a, b) =>
       (a.name ?? "").localeCompare(b.name ?? "", undefined, { sensitivity: "base" })
@@ -47,16 +45,31 @@ export function CinemaList({ theaters }: CinemaListProps) {
         const websiteLabel = (item.website ?? "").trim();
 
         return (
-          <View style={styles.card}>
+            <Pressable
+              onPress={() =>
+                router.push({
+                  pathname: "/theater_details",
+                  params: { theater: JSON.stringify(item) },
+                })
+              }
+              style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+            >
             <Text style={styles.name} numberOfLines={1}>
               {item.name}
             </Text>
 
             <Pressable
-              onPress={() => openUrl(websiteUrl)}
+              onPress={(e) => {
+                e.stopPropagation();
+                openUrl(websiteUrl);
+              }}
               disabled={!websiteUrl}
               hitSlop={10}
-              style={[styles.websiteRow, !websiteUrl && styles.disabled]}
+              style={({ pressed }) => [
+                styles.websiteRow,
+                !websiteUrl && styles.disabled,
+                pressed && websiteUrl ? styles.websiteRowPressed : null,
+              ]}
             >
               <Ionicons name="globe-outline" size={16} color={Colors.default.primary} />
               <Text style={styles.websiteText} numberOfLines={1}>
@@ -66,7 +79,7 @@ export function CinemaList({ theaters }: CinemaListProps) {
                 <Ionicons name="open-outline" size={16} color={Colors.default.primary} />
               )}
             </Pressable>
-          </View>
+          </Pressable>
         );
       }}
     />
@@ -76,7 +89,6 @@ export function CinemaList({ theaters }: CinemaListProps) {
 const styles = StyleSheet.create({
   list: { padding: 12 },
   sep: { height: 10 },
-
   card: {
     backgroundColor: Colors.default.primary,
     borderRadius: 14,
@@ -85,13 +97,12 @@ const styles = StyleSheet.create({
     padding: 12,
     gap: 10,
   },
-
+  cardPressed: { opacity: 0.9, transform: [{ scale: 0.995 }] },
   name: {
     color: Colors.default.secondary,
     fontFamily: Fonts.heading.semibold,
     fontSize: 16,
   },
-
   websiteRow: {
     backgroundColor: Colors.default.action,
     borderRadius: 10,
@@ -101,13 +112,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8 as any,
   },
-
+  websiteRowPressed: { opacity: 0.9 },
   websiteText: {
     flex: 1,
     color: Colors.default.primary,
     fontFamily: Fonts.body.semibold,
     fontSize: 12,
   },
-
   disabled: { opacity: 0.45 },
 });
