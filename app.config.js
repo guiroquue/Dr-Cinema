@@ -22,9 +22,6 @@ export default {
       bundleIdentifier: "com.drcinema.app",
     },
 
-    web: {
-      favicon: "./src/assets/images/favicon.svg",
-    },
 
     extra: {
       KVIKMYNDIR_BASE_URL: process.env.EXPO_PUBLIC_KVIKMYNDIR_BASE_URL,
