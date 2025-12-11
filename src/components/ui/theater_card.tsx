@@ -144,7 +144,8 @@ const styles = StyleSheet.create({
 
   card: {
     backgroundColor: Colors.default.secondary,
-    padding: 12,
+    paddingTop: 12,
+    paddingHorizontal: 12,
     borderRadius: 12,
   },
 
@@ -162,8 +163,8 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    fontSize: 18,
-    fontFamily: Fonts.heading.semibold,
+    fontSize: 28,
+    fontFamily: Fonts.heading.bold,
   },
 
   websiteBtn: {
@@ -178,7 +179,8 @@ const styles = StyleSheet.create({
 
   websiteLabel: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 16,
+    marginBottom: 2,
     fontFamily: Fonts.body.semibold,
   },
 });
