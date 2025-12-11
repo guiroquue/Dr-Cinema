@@ -81,7 +81,7 @@ function TheaterCard({
         style={styles.cardInner}
       >
         <Text style={[styles.name, { color: theme.primary }]} numberOfLines={1}>
-          {theater.name}
+          {theater.name.replace(",", "")}
         </Text>
 
         {websiteUrl && (
@@ -110,7 +110,7 @@ export function CinemaList({ theaters }: { theaters: Theater[] }) {
   const router = useRouter();
 
   const sorted = useMemo(
-    () => [...theaters].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")),
+    () => [...theaters].sort((a, b) => (a.name.replace(",", " ") ?? "").localeCompare(b.name.replace(",", " ") ?? "")),
     [theaters]
   );
 
