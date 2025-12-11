@@ -15,10 +15,8 @@ import type { Movie } from "@/types/movie";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { loadMovies } from "@/store/current_movie_slice";
 
-// re-use your helpers if they still make sense for “current” movies
 import { dedupeByImdb } from "@/utils/movie_dedupe";
 import { sortByReleaseDate } from "@/utils/movie_sort";
-import { groupMoviesByMonth } from "@/utils/movie_group";
 
 export default function CurrentMoviesView() {
   const listRef = useRef<SectionList<Movie>>(null);
@@ -28,15 +26,22 @@ export default function CurrentMoviesView() {
   const theme = Colors.default;
   const dispatch = useAppDispatch();
 
-  // 🔁 note `movies` slice instead of `upcoming`
   const movies = useAppSelector((s) => s.movies.items);
   const loading = useAppSelector((s) => s.movies.loading);
   const error = useAppSelector((s) => s.movies.error);
 
-  // Adjust pipeline as you want; dropping filterUpcoming here:
   const unique = dedupeByImdb(movies);
   const sorted = sortByReleaseDate(unique);
-  const sections = groupMoviesByMonth(sorted);
+
+  const sections =
+    sorted.length > 0
+      ? [
+          {
+            title: "Now playing",
+            data: sorted,
+          },
+        ]
+      : [];
 
   useEffect(() => {
     if (movies.length === 0) {

@@ -24,6 +24,7 @@ export async function apiGet(
   });
 
   const data = await response.json();
+  console.log("apiGet response data =", data);
 
   if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
   if (data?.success === false) throw new Error(data.message || "API error");
