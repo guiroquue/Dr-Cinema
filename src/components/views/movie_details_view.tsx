@@ -134,7 +134,7 @@ export default function MovieDetailsView() {
               <Text style={styles.text}>Genres: {item.omdb[0].Genre}</Text>
           </>
         )}
-          
+
 
           <FavoriteButton movie={item} />
 
@@ -156,7 +156,7 @@ export default function MovieDetailsView() {
                           videoId={key}
                         />
                       )}
-                      
+
                     </View>
                   );
                 })}

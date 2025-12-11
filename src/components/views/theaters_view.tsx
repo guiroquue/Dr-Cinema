@@ -1,13 +1,13 @@
-// components/theaters_view.tsx
 import React, { useEffect } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
-import { CinemaList } from "@/components/ui/theater_card"; // <- adjust if your path differs
-import { fetchTheaters } from "@/store/theaters_slice"; // <- adjust to your slice path
+import { CinemaList } from "@/components/ui/theater_card";
+import { fetchTheaters } from "@/store/theaters_slice";
 import { Colors, Fonts } from "@/constants/theme";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// If you have typed hooks/types, swap these for useAppDispatch/useAppSelector + RootState.
+
 type RootState = any;
 
 type TheatersViewProps = {
@@ -25,16 +25,16 @@ export default function TheatersView({ baseUrl, token }: TheatersViewProps) {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <SafeAreaView style={styles.safe}>
         <ActivityIndicator />
         <Text style={styles.muted}>Loading cinemas…</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.center}>
+      <SafeAreaView style={styles.safe}>
         <Text style={styles.errorText}>{error}</Text>
         <Pressable
           style={styles.retryBtn}
@@ -42,7 +42,7 @@ export default function TheatersView({ baseUrl, token }: TheatersViewProps) {
         >
           <Text style={styles.retryText}>Retry</Text>
         </Pressable>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -50,28 +50,29 @@ export default function TheatersView({ baseUrl, token }: TheatersViewProps) {
 }
 
 const styles = StyleSheet.create({
-  center: {
+  safe: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-    gap: 10,
+    paddingHorizontal: 20,
   },
+
   muted: {
     color: Colors.default.secondary,
     fontFamily: Fonts.body.medium,
   },
+
   errorText: {
     color: "tomato",
     fontFamily: Fonts.body.semibold,
     textAlign: "center",
   },
+
   retryBtn: {
     backgroundColor: Colors.default.action,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 10,
   },
+
   retryText: {
     color: Colors.default.primary,
     fontFamily: Fonts.body.semibold,

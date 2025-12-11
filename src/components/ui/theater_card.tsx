@@ -1,11 +1,22 @@
-// CinemaList.tsx
-import React, { useMemo } from "react";
-import { FlatList, Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useMemo, useRef } from "react";
+import {
+  Animated,
+  FlatList,
+  Linking,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Colors, Fonts } from "@/constants/theme";
 import { useRouter } from "expo-router";
 
+import { Colors, Fonts } from "@/constants/theme";
 import type { Theater } from "@/types/theatre";
+
+/* -------------------------------------------------------
+   Helpers
+------------------------------------------------------- */
 
 function normalizeWebsite(url?: string | null) {
   const trimmed = (url ?? "").trim();
@@ -21,103 +32,153 @@ async function openUrl(url: string) {
   } catch {}
 }
 
-type CinemaListProps = {
-  theaters: Theater[];
-};
+/* -------------------------------------------------------
+   Reusable press animation hook
+------------------------------------------------------- */
 
-export function CinemaList({ theaters }: CinemaListProps) {
+function usePressAnim() {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const animate = (to: number) => {
+    Animated.spring(scale, {
+      toValue: to,
+      speed: 18,
+      bounciness: 6,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  return {
+    animatedStyle: { transform: [{ scale }] },
+    onPressIn: () => animate(0.97),
+    onPressOut: () => animate(1),
+  };
+}
+
+/* -------------------------------------------------------
+   Theater Card Component
+------------------------------------------------------- */
+
+function TheaterCard({
+  theater,
+  onPress,
+}: {
+  theater: Theater;
+  onPress: () => void;
+}) {
+  const theme = Colors.default;
+  const website = (theater.website ?? "").trim();
+  const websiteUrl = website ? normalizeWebsite(website) : null;
+
+  const anim = usePressAnim();
+
+  return (
+    <Animated.View style={[styles.card, styles.shadow, anim.animatedStyle]}>
+      <Pressable
+        onPress={onPress}
+        onPressIn={anim.onPressIn}
+        onPressOut={anim.onPressOut}
+        style={styles.cardInner}
+      >
+        <Text style={[styles.name, { color: theme.primary }]} numberOfLines={1}>
+          {theater.name}
+        </Text>
+
+        {websiteUrl && (
+          <Pressable
+            hitSlop={10}
+            onPress={(e) => {
+              e.stopPropagation();
+              openUrl(websiteUrl);
+            }}
+            style={[styles.websiteBtn]}
+          >
+            <Ionicons name="globe-outline" size={16} color={theme.primary} />
+            <Text style={[styles.websiteLabel, { color: theme.primary }]}>
+              {website}
+            </Text>
+            <Ionicons name="open-outline" size={16} color={theme.primary} />
+          </Pressable>
+        )}
+      </Pressable>
+    </Animated.View>
+  );
+}
+
+
+export function CinemaList({ theaters }: { theaters: Theater[] }) {
   const router = useRouter();
 
-  const data = useMemo(() => {
-    return [...theaters].sort((a, b) =>
-      (a.name ?? "").localeCompare(b.name ?? "", undefined, { sensitivity: "base" })
-    );
-  }, [theaters]);
+  const sorted = useMemo(
+    () => [...theaters].sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")),
+    [theaters]
+  );
 
   return (
     <FlatList
-      data={data}
-      keyExtractor={(item) => String(item.id)}
+      data={sorted}
+      keyExtractor={(t) => String(t.id)}
       contentContainerStyle={styles.list}
-      ItemSeparatorComponent={() => <View style={styles.sep} />}
-      renderItem={({ item }) => {
-        const websiteUrl = normalizeWebsite(item.website);
-        const websiteLabel = (item.website ?? "").trim();
-
-        return (
-            <Pressable
-              onPress={() =>
-                router.push({
-                  pathname: "/theater_details",
-                  params: { theater: JSON.stringify(item) },
-                })
-              }
-              style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-            >
-            <Text style={styles.name} numberOfLines={1}>
-              {item.name}
-            </Text>
-
-            <Pressable
-              onPress={(e) => {
-                e.stopPropagation();
-                openUrl(websiteUrl);
-              }}
-              disabled={!websiteUrl}
-              hitSlop={10}
-              style={({ pressed }) => [
-                styles.websiteRow,
-                !websiteUrl && styles.disabled,
-                pressed && websiteUrl ? styles.websiteRowPressed : null,
-              ]}
-            >
-              <Ionicons name="globe-outline" size={16} color={Colors.default.primary} />
-              <Text style={styles.websiteText} numberOfLines={1}>
-                {websiteLabel || "No website"}
-              </Text>
-              {!!websiteUrl && (
-                <Ionicons name="open-outline" size={16} color={Colors.default.primary} />
-              )}
-            </Pressable>
-          </Pressable>
-        );
-      }}
+      ItemSeparatorComponent={() => <View style={{ height: 14 }} />}
+      renderItem={({ item }) => (
+        <TheaterCard
+          theater={item}
+          onPress={() =>
+            router.push({
+              pathname: "/theater_details",
+              params: { theater: JSON.stringify(item) }
+            })
+          }
+        />
+      )}
     />
   );
 }
 
 const styles = StyleSheet.create({
-  list: { padding: 12 },
-  sep: { height: 10 },
+  list: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 32,
+  },
+
   card: {
-    backgroundColor: Colors.default.primary,
-    borderRadius: 14,
-    borderWidth: 0.5,
-    borderColor: Colors.default.secondary,
+    backgroundColor: Colors.default.secondary,
     padding: 12,
-    gap: 10,
+    borderRadius: 12,
   },
-  cardPressed: { opacity: 0.9, transform: [{ scale: 0.995 }] },
+
+  shadow: {
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+
+  cardInner: {
+    flexDirection: "column",
+    gap: 12,
+  },
+
   name: {
-    color: Colors.default.secondary,
+    fontSize: 18,
     fontFamily: Fonts.heading.semibold,
-    fontSize: 16,
   },
-  websiteRow: {
-    backgroundColor: Colors.default.action,
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+
+  websiteBtn: {
     flexDirection: "row",
+    paddingVertical: 12,
     alignItems: "center",
-    gap: 8 as any,
+    gap: 6,
+    borderTopWidth: 1,
+    borderStyle: "dashed",
+    borderColor: Colors.default.primary
   },
-  websiteRowPressed: { opacity: 0.9 },
-  websiteText: {
+
+  websiteLabel: {
     flex: 1,
-    color: Colors.default.primary,
+    fontSize: 13,
     fontFamily: Fonts.body.semibold,
-    fontSize: 12,
   },
-  disabled: { opacity: 0.45 },
 });
