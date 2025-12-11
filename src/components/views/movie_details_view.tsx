@@ -1,15 +1,7 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Image,
-  Platform,
-} from "react-native";
+import { useEffect, useMemo } from "react";
+import { StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
-import YoutubePlayer from "react-native-youtube-iframe";
 
 import { Colors } from "@/constants/theme";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -17,7 +9,8 @@ import {
   loadMovieDetails,
   clearMovieDetails,
 } from "@/store/upcoming_movie_details_slice";
-import FavoriteButton from "../ui/favorite_button";
+
+import MovieInfo from "@/components/ui/movie_details/movie_info";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
@@ -41,40 +34,15 @@ export default function MovieDetailsView() {
     };
   }, [dispatch, resolvedImdbId]);
 
+  // Poster selection logic
   const posterUrl = useMemo(() => {
     if (!item) return null;
 
     return (
       item.poster ||
-      item.poster_url ||
-      item.primaryImage ||
-      item.primaryImage?.url ||
-      item.images?.poster ||
-      item.image ||
       null
     );
   }, [item]);
-
-
-  const trailers = useMemo(() => {
-    if (!item?.trailers) return [];
-
-    const allResults = item.trailers.flatMap((t: any) => t.results ?? []);
-
-    const filtered = allResults.filter(
-      (r: any) => r.site === "YouTube" && r.type === "Trailer"
-    );
-
-    const unique = new Map<string, any>();
-    for (const t of filtered) {
-      const key = t.id ?? t.key;
-      if (!key) continue;
-      if (!unique.has(key)) unique.set(key, t);
-    }
-
-    return Array.from(unique.values());
-  }, [item]);
-
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
@@ -91,78 +59,7 @@ export default function MovieDetailsView() {
       )}
 
       {resolvedImdbId && !loading && !error && item && (
-        <ScrollView
-          style={{ width: "100%" }}
-          contentContainerStyle={{ flexGrow:1, paddingBottom: 32 }}
-        >
-
-      {posterUrl && (
-        <Image
-          source={{ uri: posterUrl }}
-          resizeMode="cover"
-          style={styles.poster}
-        />
-      )}
-
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.text}>Ár: {item.year}</Text>
-
-      {!!item.plot && <Text style={styles.text}>Plot: {item.plot}</Text>}
-
-      {item && item.omdb && item.omdb.length > 0 && (
-          <>
-              {/* omdb stuff */}
-              <Text style={styles.text}>Duration: {item.omdb[0].Runtime}</Text>
-              <Text style={styles.text}>Year: {item.omdb[0].Year}</Text>
-              <Text style={styles.text}>Rating: {item.omdb[0].Rated || "N/A"}</Text>
-              <Text style={styles.text}>Director: {item.omdb[0].Director}</Text>
-              <Text style={styles.text}>Writers: {item.omdb[0].Writer}</Text>
-              <Text style={styles.text}>Actors: {item.omdb[0].Actors}</Text>
-              <Text style={styles.text}>Country: {item.omdb[0].Country}</Text>
-
-              <Text style={styles.text}>
-                IMDB: {item.omdb[0].imdbRating || "N/A"}
-              </Text>
-              {item.omdb[0].Ratings && item.omdb[0].Ratings.length > 0 && (
-                <Text style={styles.text}>
-                  Rotten Tomatoes:{" "}
-                  {item.omdb[0].Ratings.find((r: any) => r.Source === "Rotten Tomatoes")
-                    ?.Value || "N/A"}
-                </Text>
-              )}
-
-              <Text style={styles.text}>Genres: {item.omdb[0].Genre}</Text>
-          </>
-        )}
-
-
-          <FavoriteButton movie={item} />
-
-          {trailers.length > 0 && (
-            <View style={styles.trailersContainer}>
-              <Text style={styles.trailersHeader}>Trailers</Text>
-                {trailers.map((t: any) => {
-                  const key = t.key || t.id;
-                  return (
-                    <View key={key} style={{ marginBottom: 12 }}>
-                      {t.type && (
-                        <Text style={styles.trailerText}>{t.name}</Text>
-                      )}
-                      {Platform.OS !== "web" && (
-                        <YoutubePlayer
-                          height={220}
-                          width={"100%"}
-                          play={false}
-                          videoId={key}
-                        />
-                      )}
-
-                    </View>
-                  );
-                })}
-            </View>
-          )}
-        </ScrollView>
+        <MovieInfo item={item} posterUrl={posterUrl} />
       )}
     </SafeAreaView>
   );
@@ -171,52 +68,9 @@ export default function MovieDetailsView() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    paddingHorizontal: 20,
   },
-
-  poster: {
-    width: "100%",
-    height: 450,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-
-  title: {
-    fontSize: 26,
-    fontWeight: "700",
-    paddingHorizontal: 20,
-    marginBottom: 8,
-  },
-
   text: {
     paddingHorizontal: 20,
-    marginBottom: 8,
-    fontSize: 16,
-  },
-
-  trailersContainer: {
-    marginTop: 24,
-    paddingHorizontal: 20,
-  },
-
-  trailersHeader: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
-
-  trailerButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: Colors.default.action,
-    marginTop: 8,
-  },
-
-  trailerText: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: Colors.default.secondary,
+    marginTop: 20,
   },
 });
