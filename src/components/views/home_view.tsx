@@ -23,11 +23,11 @@ import { loadMovies } from "@/store/current_movie_slice";
 
 import { dedupeByImdb } from "@/utils/movie_dedupe";
 import { sortByReleaseDate } from "@/utils/movie_sort";
-import { applyMovieFilters, MovieFilter } from "@/utils/movie_filtering";
+import { applyMovieFilters } from "@/utils/movie_filtering";
 import { BlurView } from "expo-blur";
 
 export default function CurrentMoviesView() {
-  const listRef = useRef<SectionList<Movie>>(null);
+  const listRef = useRef<SectionList<any>>(null);
   const [showTopBtn, setShowTopBtn] = useState(false);
   const [filterVisible, setFilterVisible] = useState(false);
   const insets = useSafeAreaInsets();
@@ -38,16 +38,57 @@ export default function CurrentMoviesView() {
   const loading = useAppSelector((s) => s.movies.loading);
   const error = useAppSelector((s) => s.movies.error);
 
-  const unique = dedupeByImdb(movies);
+  const unique = dedupeByImdb(movies); // dedupe first
   const sorted = sortByReleaseDate(unique);
 
-  const [filters, setFilters] = useState(DEFAULT_FILTERS)
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   const filteredMovies = useMemo(() => {
     return applyMovieFilters(sorted, filters);
   }, [sorted, filters]);
 
-  const sections = filteredMovies.length > 0 ? [{ title: "Now playing", data: filteredMovies }] : [];
+  // -------------------------------
+  // Group movies per theater (one card per theater, all showtimes included)
+  // -------------------------------
+  const sections = useMemo(() => {
+    if (!filteredMovies || filteredMovies.length === 0) return [];
+
+    const map: Record<string, any[]> = {};
+
+    for (const movie of filteredMovies) {
+      if (!movie.showtimes || movie.showtimes.length === 0) continue;
+
+      // collect all theaters for this movie
+      const theaters = Array.from(
+        new Set(
+          movie.showtimes.map(
+            (show) => show.cinema?.name ?? "Óþekkt bíó"
+          )
+        )
+      );
+
+      for (const theater of theaters) {
+        if (!map[theater]) map[theater] = [];
+
+        // include movie with just the showtimes for this theater
+        const showtimesForTheater = movie.showtimes.filter(
+          (s) => ( s.cinema?.name ?? "Óþekkt bíó") === theater
+        );
+
+        map[theater].push({
+          ...movie,
+          showtimes: showtimesForTheater,
+          _cinemaKey: `${movie._id ?? movie.ids.imdb}-${theater}`,
+        });
+      }
+    }
+
+    return Object.entries(map).map(([theater, movies]) => ({
+      title: theater,
+      data: movies,
+    }));
+  }, [filteredMovies]);
+  // -------------------------------
 
   useEffect(() => {
     if (movies.length === 0) {
@@ -80,6 +121,16 @@ export default function CurrentMoviesView() {
         </Pressable>
       </Modal>
 
+      {/* GLOBAL FILTER BUTTON */}
+      <View style={styles.filterBar}>
+        <Pressable onPress={() => setFilterVisible(true)} style={styles.filterIconBtn}>
+          <Ionicons name="filter" size={28} color={theme.secondary} />
+          <Text style={{ marginLeft: 6, fontFamily: Fonts.body.semibold, fontSize: 16, color: theme.secondary }}>
+            Filter
+          </Text>
+        </Pressable>
+      </View>
+
       {loading && <Text style={styles.sectionHeader}>Loading…</Text>}
       {!loading && error && <Text style={styles.sectionHeader}>Error: {error}</Text>}
 
@@ -95,19 +146,14 @@ export default function CurrentMoviesView() {
                 if (!imdbId) return;
                 router.push({
                   pathname: "/movie_details",
-                  params: { imdbId, type:"movie" },
+                  params: { imdbId, type: "movie" },
                 });
               }}
             />
           )}
-          keyExtractor={(item, index) => `${item._id}-${index}`}
+          keyExtractor={(item) => item._cinemaKey}
           renderSectionHeader={({ section }) => (
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionHeader}>{section.title}</Text>
-              <Pressable onPress={() => setFilterVisible(true)} style={styles.filterIconBtn}>
-                <Ionicons name="filter" size={28} color={theme.secondary} />
-              </Pressable>
-            </View>
+            <Text style={styles.sectionHeader}>{section.title.replace(",", "")}</Text>
           )}
           stickySectionHeadersEnabled={false}
           contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 126 }}
@@ -144,19 +190,18 @@ const styles = StyleSheet.create({
     color: Colors.default.secondary,
     backgroundColor: Colors.default.background,
   },
-  sectionHeaderRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 6,
-    marginBottom: 8,
-    marginTop: 8,
+  filterBar: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: Colors.default.background,
+    borderBottomWidth: 1,
+    borderColor: Colors.default.secondary + "33",
   },
-  filterIconBtn: { padding: 4 },
-  modalOverlay: { 
-    flex: 1, 
-    justifyContent: "center", 
-    padding: 12 
+  filterIconBtn: { flexDirection: "row", alignItems: "center" },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 12,
   },
   blurWrapper: {
     maxHeight: "70%",

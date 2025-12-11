@@ -12,13 +12,13 @@ export default function TabsLayout() {
     <Tabs
   screenOptions={{
     headerShown: false,
-    tabBarActiveTintColor: Colors.default.action,
+    tabBarActiveTintColor: Colors.default.secondary,
     tabBarItemStyle: {
         paddingTop: 12,
         paddingBottom: 12,
     },
     tabBarStyle: {
-        height: 98,
+        height: 112,
         position: "absolute",
         borderTopWidth: 0.5,
         borderTopColor: "rgba(0,0,0,0.10)",

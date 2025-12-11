@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { StyleSheet, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 
 import { Colors } from "@/constants/theme";
@@ -17,19 +17,19 @@ import {
 } from "@/store/current_movie_details_slice";
 
 import MovieInfo from "@/components/ui/movie_details/movie_info";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
   const dispatch = useAppDispatch();
 
-  // get imdbId + type from route
   const { imdbId, type } = useLocalSearchParams<{
     imdbId?: string | string[];
     type?: string | string[];
   }>();
 
   const resolvedImdbId = Array.isArray(imdbId) ? imdbId[0] : imdbId;
-  const resolvedType = Array.isArray(type) ? type[0] : type; // "upcoming" | "movie" | undefined
+  const resolvedType = Array.isArray(type) ? type[0] : type;
 
   const isUpcoming = resolvedType === "upcoming";
   const isCurrent = resolvedType === "movie";
@@ -37,9 +37,10 @@ export default function MovieDetailsView() {
   console.log("MovieDetails params:", imdbId, type);
 
 
-  // select from both slices, then pick based on type
   const upcomingState = useAppSelector((s) => s.movieDetails);
   const currentState = useAppSelector((s) => s.currentMovieDetails);
+
+  const insets = useSafeAreaInsets();
 
   const { item, loading, error } = isUpcoming
     ? upcomingState
@@ -66,7 +67,6 @@ export default function MovieDetailsView() {
   }, [dispatch, resolvedImdbId, resolvedType, isUpcoming, isCurrent]);
 
 
-  // Poster selection logic
   const posterUrl = useMemo(() => {
     if (!item) return null;
     return item.poster || null;
@@ -96,6 +96,17 @@ export default function MovieDetailsView() {
       {!missingParams && !invalidType && resolvedImdbId && !loading && !error && item && (
         <MovieInfo item={item} posterUrl={posterUrl} />
       )}
+
+      <LinearGradient
+        colors={[Colors.default.background + "00", Colors.default.background]}
+        style={{ position: "absolute", bottom: 64, left: 0, right: 0, height: insets.bottom + 12, zIndex: 10 }}
+        pointerEvents="none"
+      />
+      <LinearGradient
+        colors={[Colors.default.background, Colors.default.background + "00"]}
+        style={{ position: "absolute", top: 12, left: 0, right: 0, height: insets.top - 26, zIndex: 10 }}
+        pointerEvents="none"
+      />
     </SafeAreaView>
   );
 }
@@ -103,6 +114,8 @@ export default function MovieDetailsView() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+    paddingTop: -48,
+    paddingBottom: 32,
   },
   text: {
     paddingHorizontal: 20,

@@ -13,28 +13,8 @@ import { useRouter } from "expo-router";
 
 import { Colors, Fonts } from "@/constants/theme";
 import type { Theater } from "@/types/theatre";
+import { WebsiteLink, normalizeWebsite } from "./theater_website_link";
 
-/* -------------------------------------------------------
-   Helpers
-------------------------------------------------------- */
-
-function normalizeWebsite(url?: string | null) {
-  const trimmed = (url ?? "").trim();
-  if (!trimmed) return "";
-  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
-}
-
-async function openUrl(url: string) {
-  if (!url) return;
-  try {
-    const can = await Linking.canOpenURL(url);
-    if (can) await Linking.openURL(url);
-  } catch {}
-}
-
-/* -------------------------------------------------------
-   Reusable press animation hook
-------------------------------------------------------- */
 
 function usePressAnim() {
   const scale = useRef(new Animated.Value(1)).current;
@@ -55,9 +35,6 @@ function usePressAnim() {
   };
 }
 
-/* -------------------------------------------------------
-   Theater Card Component
-------------------------------------------------------- */
 
 function TheaterCard({
   theater,
@@ -84,22 +61,7 @@ function TheaterCard({
           {theater.name.replace(",", "")}
         </Text>
 
-        {websiteUrl && (
-          <Pressable
-            hitSlop={10}
-            onPress={(e) => {
-              e.stopPropagation();
-              openUrl(websiteUrl);
-            }}
-            style={[styles.websiteBtn]}
-          >
-            <Ionicons name="globe-outline" size={16} color={theme.primary} />
-            <Text style={[styles.websiteLabel, { color: theme.primary }]}>
-              {website}
-            </Text>
-            <Ionicons name="open-outline" size={16} color={theme.primary} />
-          </Pressable>
-        )}
+        {websiteUrl && <WebsiteLink url={websiteUrl} label={website} />}
       </Pressable>
     </Animated.View>
   );
@@ -144,8 +106,7 @@ const styles = StyleSheet.create({
 
   card: {
     backgroundColor: Colors.default.secondary,
-    paddingTop: 12,
-    paddingHorizontal: 12,
+    padding: 12,
     borderRadius: 12,
   },
 
@@ -165,6 +126,10 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 28,
     fontFamily: Fonts.heading.bold,
+    borderBottomWidth: 1,
+    paddingBottom: 22,
+    borderStyle: "dashed",
+    borderColor: Colors.default.primary,
   },
 
   websiteBtn: {

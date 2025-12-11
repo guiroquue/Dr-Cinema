@@ -6,7 +6,7 @@ export default function FavoritesScreen() {
     <>
       <Stack.Screen
         options={{
-          title: "Favorites",
+          title: "Úppáhalds",
           headerShadowVisible: false,
           headerRight: () => null,
         }}
