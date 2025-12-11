@@ -27,7 +27,7 @@ export default function TabsLayout() {
     },
     tabBarBackground: () =>
       Platform.OS === "ios" ? (
-        <BlurView tint="light" intensity={10} style={{ flex: 1 }} />
+        <BlurView tint="light" intensity={20} style={{ flex: 1 }} />
       ) : (
         <View style={{ flex: 1, backgroundColor: Colors.default.primary }} />
       ),
