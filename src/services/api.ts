@@ -16,7 +16,7 @@ export async function apiGet(
   token = extra.KVIKMYNDIR_API_KEY
 ) {
   const url = `${baseUrl}${path}`;
-
+  console.log("apiGet url =", url);
   const response = await fetch(url, {
     headers: {
       "x-access-token": token,
@@ -24,7 +24,7 @@ export async function apiGet(
   });
 
   const data = await response.json();
-  console.log("apiGet response data =", data);
+  //console.log("apiGet response data =", data);
 
   if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
   if (data?.success === false) throw new Error(data.message || "API error");

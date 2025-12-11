@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import type { Movie } from "@/types/movie";
-import { fetchUpcomingMovieByImdb } from "@/services/upcoming_movie_details";
+import { fetchMovieByImdb } from "@/services/movie_details";
 
 type MovieDetailsState = {
   item: Movie | null;
@@ -14,16 +14,15 @@ const initialState: MovieDetailsState = {
   error: null,
 };
 
-// Thunk: load movie details
-export const upcomingLoadMovieDetails = createAsyncThunk<
+export const loadMovieDetails = createAsyncThunk<
   Movie,
   { imdbId: string; baseUrl?: string; token?: string }
 >("movieDetails/load", async ({ imdbId, baseUrl, token }) => {
-  return await fetchUpcomingMovieByImdb(imdbId, baseUrl, token);
+  return await fetchMovieByImdb(imdbId, baseUrl, token);
 });
 
-const upcomingMovieDetailsSlice = createSlice({
-  name: "upcomingMovieDetails",
+const currentMovieDetailsSlice = createSlice({
+  name: "currentMovieDetails",
   initialState,
   reducers: {
     clearMovieDetails(state) {
@@ -34,25 +33,25 @@ const upcomingMovieDetailsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(upcomingLoadMovieDetails.pending, (state) => {
+      .addCase(loadMovieDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.item = null;
       })
       .addCase(
-        upcomingLoadMovieDetails.fulfilled,
+        loadMovieDetails.fulfilled,
         (state, action: PayloadAction<Movie>) => {
           state.loading = false;
           state.item = action.payload;
         }
       )
-      .addCase(upcomingLoadMovieDetails.rejected, (state, action) => {
+      .addCase(loadMovieDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message ?? "Failed to load movie details";
       });
   },
 });
 
-export const { clearMovieDetails } = upcomingMovieDetailsSlice.actions;
+export const { clearMovieDetails } = currentMovieDetailsSlice.actions;
 
-export default upcomingMovieDetailsSlice.reducer;
+export default currentMovieDetailsSlice.reducer;

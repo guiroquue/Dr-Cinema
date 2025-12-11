@@ -93,7 +93,10 @@ export default function CurrentMoviesView() {
               onPress={() => {
                 const imdbId = item.ids.imdb;
                 if (!imdbId) return;
-                router.push({ pathname: "/movie_details", params: { imdbId } });
+                router.push({
+                  pathname: "/movie_details",
+                  params: { imdbId, type:"movie" },
+                });
               }}
             />
           )}

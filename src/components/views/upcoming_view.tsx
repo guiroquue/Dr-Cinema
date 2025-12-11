@@ -74,7 +74,7 @@ export default function UpcomingView() {
                 if (!imdbId) return;
                 router.push({
                   pathname: "/movie_details",
-                  params: { imdbId },
+                  params: { imdbId, type: "upcoming" },
                 });
               }}
             />

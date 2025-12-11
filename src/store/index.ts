@@ -5,14 +5,15 @@ import upcomingReducer from "./upcoming_movies_slice";
 import movieDetailsReducer from "./upcoming_movie_details_slice";
 import moviesReducer from "./current_movie_slice";
 import TheatersReducer from "@/store/theaters_slice";
-
+import currentMovieDetailsReducer from "./current_movie_details_slice";
 export const store = configureStore({
   reducer: {
     favorites: favoritesReducer,
     upcoming: upcomingReducer,
-    movieDetails: movieDetailsReducer,
     movies:moviesReducer,
     theaters: TheatersReducer,
+    movieDetails: movieDetailsReducer,          // upcoming
+    currentMovieDetails: currentMovieDetailsReducer,
     // add more slices here as you build them
   },
 });
