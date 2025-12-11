@@ -6,6 +6,8 @@ import { CinemaList } from "@/components/ui/theater_card";
 import { fetchTheaters } from "@/store/theaters_slice";
 import { Colors, Fonts } from "@/constants/theme";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 type RootState = any;
@@ -18,6 +20,7 @@ type TheatersViewProps = {
 export default function TheatersView({ baseUrl, token }: TheatersViewProps) {
   const dispatch = useDispatch<any>();
   const { items, loading, error } = useSelector((state: RootState) => state.theaters);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     dispatch(fetchTheaters({ baseUrl, token }));
@@ -26,6 +29,8 @@ export default function TheatersView({ baseUrl, token }: TheatersViewProps) {
   const styles = StyleSheet.create({
     safe: {
       flex: 1,
+      paddingTop: -32,
+      paddingBottom: 64,
     },
 
     muted: {
@@ -72,5 +77,16 @@ export default function TheatersView({ baseUrl, token }: TheatersViewProps) {
       ) : (
         <CinemaList theaters={items} />
       )}
+
+      <LinearGradient
+        colors={[Colors.default.background + "00", Colors.default.background]}
+        style={{ position: "absolute", bottom: 24, left: 0, right: 0, height: insets.bottom + 120, zIndex: 10 }}
+        pointerEvents="none"
+      />
+      <LinearGradient
+        colors={[Colors.default.background, Colors.default.background + "00"]}
+        style={{ position: "absolute", top: 20, left: 0, right: 0, height: insets.top - 26, zIndex: 10 }}
+        pointerEvents="none"
+      />
     </SafeAreaView>
   )};

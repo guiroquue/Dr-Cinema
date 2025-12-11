@@ -151,8 +151,8 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 20,
-    fontFamily: Fonts.heading.semibold,
+    fontSize: 18,
+    fontFamily: Fonts.heading.black,
     color: TEXT,
     marginBottom: 4,
     marginTop: 8,

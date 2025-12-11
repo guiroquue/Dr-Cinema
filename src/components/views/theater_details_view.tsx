@@ -1,12 +1,22 @@
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { WebView } from "react-native-webview";
 import type { Theater } from "@/types/theatre";
 import { useAppSelector } from "@/store/hooks";
-import { Colors } from "@/constants/theme";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Colors, Fonts } from "@/constants/theme";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { WebsiteLink, normalizeWebsite } from "../ui/theater_website_link";
+import { LinearGradient } from "expo-linear-gradient";
 
+function openMaps(address: string) {
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+  Linking.openURL(url).catch(() => {});
+}
+
+function makeCall(number: string) {
+  const url = `tel:${number}`;
+  Linking.openURL(url).catch(() => {});
+}
 
 function stripHtml(html?: string | null) {
   const s = (html ?? "").trim();
@@ -19,20 +29,10 @@ function stripHtml(html?: string | null) {
     .trim();
 }
 
-function Field({ label, value }: { label: string; value?: string | null }) {
-  return (
-    <View style={styles.field}>
-      <Text style={styles.label}>{label}</Text>
-      <Text style={styles.value}>{(value ?? "").trim() || "—"}</Text>
-    </View>
-  );
-}
-
 export default function TheaterDetails() {
-  // now we only pass `id` from the list:
-  // router.push({ pathname: "/theater_details", params: { id: String(item.id) } })
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
   const theaterId = Array.isArray(id) ? id[0] : id;
+  const insets = useSafeAreaInsets();
 
   const loading = useAppSelector((s) => s.theaters.loading);
   const error = useAppSelector((s) => s.theaters.error);
@@ -57,32 +57,51 @@ export default function TheaterDetails() {
   }
 
   const address = [theater.address, theater.city].filter(Boolean).join(", ") || "—";
-  const description = stripHtml(theater.description);
-  const mapHtml = (theater.google_map ?? "").trim();
+  const descriptionRaw = theater.description;
+  const description = descriptionRaw ? stripHtml(descriptionRaw) : null;
+  const website = (theater.website ?? "").trim();
+  const websiteUrl = website ? normalizeWebsite(website) : null;
+
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: Colors.default.background }]}>
-      <View style={styles.card}>
-        <Text style={styles.title}>{theater.name ?? "—"}</Text>
+      <View>
+        <Text style={styles.title}>{theater.name.replace(",", "") ?? "—"}</Text>
 
-        <Field label="Address" value={address} />
-        <Field label="Phone" value={theater.phone ?? "—"} />
-        <Field label="Website" value={theater.website ?? "—"} />
-        <Field label="Description" value={description} />
+        <View style={styles.awesome_stuff}>
+          {address ? (
+            <Pressable onPress={() => openMaps(address)}>
+              <Text style={[styles.details, { textDecorationLine: "underline" }]}>{address}</Text>
+            </Pressable>
+          ) : (
+            <Text style={styles.details}>Staðsetning ekki skráð</Text>
+          )}
 
-        {!!mapHtml && (
-          <View style={{ height: 260, overflow: "hidden", borderRadius: 12 }}>
-            <WebView
-              originWhitelist={["*"]}
-              source={{
-                html: `<!doctype html><html><head>
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                </head><body style="margin:0;padding:0;">${mapHtml}</body></html>`,
-              }}
-            />
-          </View>
-        )}
+          {theater.phone ? (
+            <Pressable onPress={() => makeCall(theater.phone)}>
+              <Text style={[styles.details, { textDecorationLine: "underline" }]}>{theater.phone}</Text>
+            </Pressable>
+          ) : (
+            <Text style={styles.details}></Text>
+          )}
+        </View>
+
+        <Text style={styles.description}>{description ?? "Lýsing ekki skráð"}</Text>
+        <View style={styles.websiteLink}>
+          {websiteUrl && <WebsiteLink url={websiteUrl} label={website} />}
+        </View>
+        
       </View>
+      <LinearGradient
+        colors={[Colors.default.background + "00", Colors.default.background]}
+        style={{ position: "absolute", bottom: 64, left: 0, right: 0, height: insets.bottom + 32, zIndex: 10 }}
+        pointerEvents="none"
+      />
+      <LinearGradient
+        colors={[Colors.default.background, Colors.default.background + "00"]}
+        style={{ position: "absolute", top: 12, left: 0, right: 0, height: insets.top - 26, zIndex: 10 }}
+        pointerEvents="none"
+      />
     </SafeAreaView>
   );
 }
@@ -91,12 +110,39 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingTop: -32,
   },
   msg: { padding: 12 },
-  container: { padding: 12, paddingBottom: 24, },
-  card: { borderWidth: 1, borderRadius: 12, padding: 12, gap: 10, backgroundColor: Colors.default.background },
-  title: { fontSize: 18, fontWeight: "700" },
-  field: { gap: 3 },
-  label: { fontSize: 12, fontWeight: "600", opacity: 0.7 },
-  value: { fontSize: 13 },
+  container: { 
+    padding: 12, 
+    paddingBottom: 24, 
+  },
+  details: { 
+    gap: 10, 
+    fontSize: 16,
+    fontFamily: Fonts.body.semibold,
+  },
+  title: { 
+    fontSize: 36, 
+    fontFamily: Fonts.heading.black
+  },
+  description: {
+    marginVertical: 12,
+    lineHeight: 20,
+
+  },
+  awesome_stuff: {
+    marginVertical: 6,
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+
+  websiteLink: {
+    backgroundColor: Colors.default.secondary,
+    padding: 12,
+    fontSize: 16,
+    fontFamily: Fonts.body.semibold,
+    color: Colors.default.primary,
+    borderRadius: 12,
+  },
 });
