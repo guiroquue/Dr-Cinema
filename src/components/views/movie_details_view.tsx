@@ -5,6 +5,7 @@ import {
   View,
   ScrollView,
   Image,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
@@ -74,15 +75,6 @@ export default function MovieDetailsView() {
     return Array.from(unique.values());
   }, [item]);
 
-  const [playingTrailerKey, setPlayingTrailerKey] = useState<string | null>(
-    null
-  );
-
-  const handleStateChange = useCallback((state: string) => {
-    if (state === "ended") {
-      setPlayingTrailerKey(null);
-    }
-  }, []);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
@@ -104,18 +96,45 @@ export default function MovieDetailsView() {
           contentContainerStyle={{ flexGrow:1, paddingBottom: 32 }}
         >
 
-          {posterUrl && (
-            <Image
-              source={{ uri: posterUrl }}
-              resizeMode="cover"
-              style={styles.poster}
-            />
-          )}
+      {posterUrl && (
+        <Image
+          source={{ uri: posterUrl }}
+          resizeMode="cover"
+          style={styles.poster}
+        />
+      )}
 
-          <Text style={styles.title}>{item.title}</Text>
-          <Text style={styles.text}>Ár: {item.year}</Text>
-   
-          {!!item.plot && <Text style={styles.text}>Plot: {item.plot}</Text>}
+      <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.text}>Ár: {item.year}</Text>
+
+      {!!item.plot && <Text style={styles.text}>Plot: {item.plot}</Text>}
+
+      {item && item.omdb && item.omdb.length > 0 && (
+          <>
+              {/* omdb stuff */}
+              <Text style={styles.text}>Duration: {item.omdb[0].Runtime}</Text>
+              <Text style={styles.text}>Year: {item.omdb[0].Year}</Text>
+              <Text style={styles.text}>Rating: {item.omdb[0].Rated || "N/A"}</Text>
+              <Text style={styles.text}>Director: {item.omdb[0].Director}</Text>
+              <Text style={styles.text}>Writers: {item.omdb[0].Writer}</Text>
+              <Text style={styles.text}>Actors: {item.omdb[0].Actors}</Text>
+              <Text style={styles.text}>Country: {item.omdb[0].Country}</Text>
+
+              <Text style={styles.text}>
+                IMDB: {item.omdb[0].imdbRating || "N/A"}
+              </Text>
+              {item.omdb[0].Ratings && item.omdb[0].Ratings.length > 0 && (
+                <Text style={styles.text}>
+                  Rotten Tomatoes:{" "}
+                  {item.omdb[0].Ratings.find((r: any) => r.Source === "Rotten Tomatoes")
+                    ?.Value || "N/A"}
+                </Text>
+              )}
+
+              <Text style={styles.text}>Genres: {item.omdb[0].Genre}</Text>
+          </>
+        )}
+
 
           <FavoriteButton movie={item} />
 
@@ -129,13 +148,15 @@ export default function MovieDetailsView() {
                       {t.type && (
                         <Text style={styles.trailerText}>{t.name}</Text>
                       )}
+                      {Platform.OS !== "web" && (
+                        <YoutubePlayer
+                          height={220}
+                          width={"100%"}
+                          play={false}
+                          videoId={key}
+                        />
+                      )}
 
-                      <YoutubePlayer
-                        height={220}
-                        width={"100%"}
-                        play={false}
-                        videoId={key}
-                      />
                     </View>
                   );
                 })}

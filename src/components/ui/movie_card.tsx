@@ -8,13 +8,10 @@ import type { Movie } from "@/types/movie";
 
 import { formatDateIS } from "@/utils/date_formatter";
 
-
-
 interface MovieCardProps {
   movie: Movie;
   onPress?: () => void;
 }
-
 
 export function MovieCard({ movie, onPress }: MovieCardProps) {
   const rawRelease =
