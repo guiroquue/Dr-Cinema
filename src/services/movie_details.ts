@@ -2,16 +2,14 @@ import { apiGet } from "./api";
 import type { Movie } from "@/types/movie";
 
 
-export async function fetchUpcomingMovieByImdb(
+export async function fetchMovieByImdb(
   imdbId: string,
   baseUrl?: string,
   token?: string
 ): Promise<Movie> {
-  const normalized =
-    imdbId.trim().startsWith("tt") ? imdbId.trim() : `tt${imdbId.trim()}`;
-
+    console.log("Fetching movie by IMDB ID:", imdbId);
   const data = await apiGet(
-    `/upcoming?imdbid=${encodeURIComponent(normalized)}`,
+    `/movies?imdbid=${encodeURIComponent(imdbId)}`,
     baseUrl,
     token
   );

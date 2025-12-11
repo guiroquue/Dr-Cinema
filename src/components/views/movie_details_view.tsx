@@ -5,60 +5,95 @@ import { useLocalSearchParams } from "expo-router";
 
 import { Colors } from "@/constants/theme";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
+
 import {
-  loadMovieDetails,
-  clearMovieDetails,
+  upcomingLoadMovieDetails,
+  clearMovieDetails as clearUpcomingMovieDetails,
 } from "@/store/upcoming_movie_details_slice";
+
+import {
+  loadMovieDetails as loadCurrentMovieDetails,
+  clearMovieDetails as clearCurrentMovieDetails,
+} from "@/store/current_movie_details_slice";
 
 import MovieInfo from "@/components/ui/movie_details/movie_info";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
-
-  const { imdbId } = useLocalSearchParams<{ imdbId?: string | string[] }>();
-  const resolvedImdbId = Array.isArray(imdbId) ? imdbId[0] : imdbId;
-
   const dispatch = useAppDispatch();
 
-  const item = useAppSelector((s) => s.movieDetails.item);
-  const loading = useAppSelector((s) => s.movieDetails.loading);
-  const error = useAppSelector((s) => s.movieDetails.error);
+  // get imdbId + type from route
+  const { imdbId, type } = useLocalSearchParams<{
+    imdbId?: string | string[];
+    type?: string | string[];
+  }>();
+
+  const resolvedImdbId = Array.isArray(imdbId) ? imdbId[0] : imdbId;
+  const resolvedType = Array.isArray(type) ? type[0] : type; // "upcoming" | "movie" | undefined
+
+  const isUpcoming = resolvedType === "upcoming";
+  const isCurrent = resolvedType === "movie";
+
+  console.log("MovieDetails params:", imdbId, type);
+
+
+  // select from both slices, then pick based on type
+  const upcomingState = useAppSelector((s) => s.movieDetails);
+  const currentState = useAppSelector((s) => s.currentMovieDetails);
+
+  const { item, loading, error } = isUpcoming
+    ? upcomingState
+    : isCurrent
+    ? currentState
+    : { item: null, loading: false, error: "Invalid type param" };
 
   useEffect(() => {
-    if (!resolvedImdbId) return;
+    if (!resolvedImdbId || !resolvedType) return;
 
-    dispatch(loadMovieDetails({ imdbId: resolvedImdbId }));
+    if (isUpcoming) {
+      dispatch(upcomingLoadMovieDetails({ imdbId: resolvedImdbId }));
+    } else if (isCurrent) {
+      dispatch(loadCurrentMovieDetails({ imdbId: resolvedImdbId }));
+    }
 
     return () => {
-      dispatch(clearMovieDetails());
+      if (isUpcoming) {
+        dispatch(clearUpcomingMovieDetails());
+      } else if (isCurrent) {
+        dispatch(clearCurrentMovieDetails());
+      }
     };
-  }, [dispatch, resolvedImdbId]);
+  }, [dispatch, resolvedImdbId, resolvedType, isUpcoming, isCurrent]);
+
 
   // Poster selection logic
   const posterUrl = useMemo(() => {
     if (!item) return null;
-
-    return (
-      item.poster ||
-      null
-    );
+    return item.poster || null;
   }, [item]);
+
+  const missingParams = !resolvedImdbId || !resolvedType;
+  const invalidType = !!resolvedType && !isUpcoming && !isCurrent;
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      {!resolvedImdbId && (
-        <Text style={styles.text}>Missing imdbId route param.</Text>
+      {missingParams && (
+        <Text style={styles.text}>Missing imdbId or type route param.</Text>
       )}
 
-      {resolvedImdbId && loading && (
+      {!missingParams && invalidType && (
+        <Text style={styles.text}>Invalid type param (expected "upcoming" or "movie").</Text>
+      )}
+
+      {!missingParams && !invalidType && resolvedImdbId && loading && (
         <Text style={styles.text}>Loading…</Text>
       )}
 
-      {resolvedImdbId && !loading && error && (
+      {!missingParams && !invalidType && resolvedImdbId && !loading && error && (
         <Text style={styles.text}>Error: {error}</Text>
       )}
 
-      {resolvedImdbId && !loading && !error && item && (
+      {!missingParams && !invalidType && resolvedImdbId && !loading && !error && item && (
         <MovieInfo item={item} posterUrl={posterUrl} />
       )}
     </SafeAreaView>

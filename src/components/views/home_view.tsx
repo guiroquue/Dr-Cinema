@@ -80,7 +80,7 @@ export default function CurrentMoviesView() {
                 if (!imdbId) return;
                 router.push({
                   pathname: "/movie_details",
-                  params: { imdbId },
+                  params: { imdbId, type:"movie" },
                 });
               }}
             />
