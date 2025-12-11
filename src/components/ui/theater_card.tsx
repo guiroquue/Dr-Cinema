@@ -126,7 +126,7 @@ export function CinemaList({ theaters }: { theaters: Theater[] }) {
           onPress={() =>
             router.push({
               pathname: "/theater_details",
-              params: { theater: JSON.stringify(item) }
+              params: { id: String(item.id) }
             })
           }
         />
