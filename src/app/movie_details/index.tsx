@@ -6,7 +6,7 @@ export default function UpcomingScreen() {
     <>
       <Stack.Screen
         options={{
-          title: "Movie",
+          title: "",
           headerShadowVisible: false,
           headerRight: () => null,
         }}
