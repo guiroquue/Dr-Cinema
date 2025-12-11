@@ -161,8 +161,8 @@ export default function MovieFilters({ filters, setFilters, onApply, onReset, on
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingBottom: 40,
+    padding: 12,
+    borderRadius: 12,
   },
   headerRow: {
     flexDirection: "row",
@@ -208,10 +208,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: "48%",
     alignItems: "center",
-    backgroundColor: Colors.default.primary,
+    backgroundColor: Colors.default.secondary,
   },
   resetText: {
     fontSize: 16,
+    color: Colors.default.primary,
   },
   applyBtn: {
     padding: 12,

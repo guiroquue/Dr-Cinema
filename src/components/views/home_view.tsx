@@ -24,6 +24,7 @@ import { loadMovies } from "@/store/current_movie_slice";
 import { dedupeByImdb } from "@/utils/movie_dedupe";
 import { sortByReleaseDate } from "@/utils/movie_sort";
 import { applyMovieFilters, MovieFilter } from "@/utils/movie_filtering";
+import { BlurView } from "expo-blur";
 
 export default function CurrentMoviesView() {
   const listRef = useRef<SectionList<Movie>>(null);
@@ -67,7 +68,7 @@ export default function CurrentMoviesView() {
       {/* Filters modal */}
       <Modal visible={filterVisible} animationType="slide" transparent={true}>
         <Pressable style={styles.modalOverlay} onPress={() => setFilterVisible(false)}>
-          <View style={styles.modalContent}>
+          <BlurView intensity={80} tint="light" style={styles.blurWrapper}>
             <MovieFilters
               filters={filters}
               setFilters={setFilters}
@@ -75,7 +76,7 @@ export default function CurrentMoviesView() {
               onReset={() => setFilters(DEFAULT_FILTERS)}
               onClose={() => setFilterVisible(false)}
             />
-          </View>
+          </BlurView>
         </Pressable>
       </Modal>
 
@@ -151,14 +152,15 @@ const styles = StyleSheet.create({
   filterIconBtn: { padding: 4 },
   modalOverlay: { 
     flex: 1, 
-    backgroundColor: "rgba(0,0,0,0.5)", 
     justifyContent: "center", 
-    padding: 20 
+    padding: 12 
   },
-  modalContent: { 
-    backgroundColor: Colors.default.background, 
-    borderRadius: 12, 
-    padding: 16, 
-    maxHeight: "80%" 
+  blurWrapper: {
+    maxHeight: "70%",
+    flex: 1,
+    justifyContent: "center",
+    padding: 12,
+    borderRadius: 20,
+    overflow: "hidden",
   },
 });
