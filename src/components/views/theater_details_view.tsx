@@ -1,8 +1,9 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { WebView } from "react-native-webview";
 import type { Theater } from "@/types/theatre";
+import { useAppSelector } from "@/store/hooks";
 
 function stripHtml(html?: string | null) {
   const s = (html ?? "").trim();
@@ -25,32 +26,45 @@ function Field({ label, value }: { label: string; value?: string | null }) {
 }
 
 export default function TheaterDetails() {
-  const { theater } = useLocalSearchParams<{ theater?: string | string[] }>();
-  const raw = Array.isArray(theater) ? theater[0] : theater;
+  // now we only pass `id` from the list:
+  // router.push({ pathname: "/theater_details", params: { id: String(item.id) } })
+  const { id } = useLocalSearchParams<{ id?: string | string[] }>();
+  const theaterId = Array.isArray(id) ? id[0] : id;
 
-  const t = useMemo(() => {
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw) as Theater;
-    } catch {
-      return null;
-    }
-  }, [raw]);
+  const loading = useAppSelector((s) => s.theaters.loading);
+  const error = useAppSelector((s) => s.theaters.error);
+  const theater = useAppSelector((s) =>
+    theaterId ? (s.theaters.byId[theaterId] as Theater | undefined) : undefined
+  );
 
-  if (!t) return <Text style={styles.msg}>Missing/invalid theater data.</Text>;
+  if (!theaterId) {
+    return <Text style={styles.msg}>Missing theater id.</Text>;
+  }
 
-  const address = [t.address, t.city].filter(Boolean).join(", ") || "—";
-  const description = stripHtml(t.description);
-  const mapHtml = (t.google_map ?? "").trim();
+  if (loading && !theater) {
+    return <Text style={styles.msg}>Loading…</Text>;
+  }
+
+  if (error && !theater) {
+    return <Text style={styles.msg}>Error: {error}</Text>;
+  }
+
+  if (!theater) {
+    return <Text style={styles.msg}>No theater found.</Text>;
+  }
+
+  const address = [theater.address, theater.city].filter(Boolean).join(", ") || "—";
+  const description = stripHtml(theater.description);
+  const mapHtml = (theater.google_map ?? "").trim();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.title}>{t.name ?? "—"}</Text>
+        <Text style={styles.title}>{theater.name ?? "—"}</Text>
 
         <Field label="Address" value={address} />
-        <Field label="Phone" value={t.phone ?? "—"} />
-        <Field label="Website" value={t.website ?? "—"} />
+        <Field label="Phone" value={theater.phone ?? "—"} />
+        <Field label="Website" value={theater.website ?? "—"} />
         <Field label="Description" value={description} />
 
         {!!mapHtml && (
