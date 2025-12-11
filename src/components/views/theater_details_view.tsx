@@ -4,6 +4,9 @@ import { useLocalSearchParams } from "expo-router";
 import { WebView } from "react-native-webview";
 import type { Theater } from "@/types/theatre";
 import { useAppSelector } from "@/store/hooks";
+import { Colors } from "@/constants/theme";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 
 function stripHtml(html?: string | null) {
   const s = (html ?? "").trim();
@@ -58,7 +61,7 @@ export default function TheaterDetails() {
   const mapHtml = (theater.google_map ?? "").trim();
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: Colors.default.background }]}>
       <View style={styles.card}>
         <Text style={styles.title}>{theater.name ?? "—"}</Text>
 
@@ -80,14 +83,18 @@ export default function TheaterDetails() {
           </View>
         )}
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
   msg: { padding: 12 },
-  container: { padding: 12, paddingBottom: 24 },
-  card: { borderWidth: 1, borderRadius: 12, padding: 12, gap: 10 },
+  container: { padding: 12, paddingBottom: 24, },
+  card: { borderWidth: 1, borderRadius: 12, padding: 12, gap: 10, backgroundColor: Colors.default.background },
   title: { fontSize: 18, fontWeight: "700" },
   field: { gap: 3 },
   label: { fontSize: 12, fontWeight: "600", opacity: 0.7 },

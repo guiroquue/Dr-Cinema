@@ -77,6 +77,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" options={{ title: "Dr. Cinema" }} />
           <Stack.Screen name="favorites/index" options={{ title: "Favorites", headerBackTitle: "Back" }} />
           <Stack.Screen name="movie_details/index" options={{ title: "Movie Details", headerBackTitle: "Back" }} />
+          <Stack.Screen name="theater_details/index" options={{ title: "Theater Details", headerBackTitle: "Back" }} />
         </Stack>
       </Provider>
     </GestureHandlerRootView>
