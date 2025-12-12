@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { StyleSheet, Text, View, Button, Share, Alert, Pressable } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
 
 import { Colors } from "@/constants/theme";
@@ -18,13 +19,12 @@ import {
 } from "@/store/current_movie_details_slice";
 
 import MovieInfo from "@/components/ui/movie_details/movie_info";
-import MovieReviews from "@/components/ui/movie_review";
-import { LinearGradient } from "expo-linear-gradient";
 
 import onShareMovie from "@/components/ui/movie_details/share_button";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
+  const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
 
   const { imdbId, type } = useLocalSearchParams<{
@@ -43,31 +43,41 @@ export default function MovieDetailsView() {
   const upcomingState = useAppSelector((s) => s.movieDetails);
   const currentState = useAppSelector((s) => s.currentMovieDetails);
 
-  const insets = useSafeAreaInsets();
 
-  const { item, loading, error } = isUpcoming
-    ? upcomingState
-    : isCurrent
-    ? currentState
-    : { item: null, loading: false, error: "Invalid type param" };
+  const state =
+    resolvedType === "upcoming"
+      ? useAppSelector((s) => s.movieDetails)
+      : resolvedType === "movie"
+      ? useAppSelector((s) => s.currentMovieDetails)
+      : { item: null, loading: false, error: "Invalid type" };
+
+  const { item, loading, error } = state;
+
 
   useEffect(() => {
-    if (!resolvedImdbId || !resolvedType) return;
+    if (missingParams || invalidType) return;
 
-    if (isUpcoming) {
-      dispatch(upcomingLoadMovieDetails({ imdbId: resolvedImdbId }));
-    } else if (isCurrent) {
-      dispatch(loadCurrentMovieDetails({ imdbId: resolvedImdbId }));
+    switch (resolvedType) {
+      case "upcoming":
+        dispatch(upcomingLoadMovieDetails({ imdbId: resolvedImdbId! }));
+        break;
+
+      case "movie":
+        dispatch(loadCurrentMovieDetails({ imdbId: resolvedImdbId! }));
+        break;
     }
 
     return () => {
-      if (isUpcoming) {
-        dispatch(clearUpcomingMovieDetails());
-      } else if (isCurrent) {
-        dispatch(clearCurrentMovieDetails());
+      switch (resolvedType) {
+        case "upcoming":
+          dispatch(clearUpcomingMovieDetails());
+          break;
+        case "movie":
+          dispatch(clearCurrentMovieDetails());
+          break;
       }
     };
-  }, [dispatch, resolvedImdbId, resolvedType, isUpcoming, isCurrent]);
+  }, [resolvedImdbId, resolvedType]);
 
   const posterUrl = useMemo(() => {
     if (!item) return null;
@@ -79,6 +89,7 @@ export default function MovieDetailsView() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
+
       {missingParams && (
         <Text style={styles.text}>Missing imdbId or type route param.</Text>
       )}
@@ -89,11 +100,11 @@ export default function MovieDetailsView() {
         </Text>
       )}
 
-      {!missingParams && !invalidType && resolvedImdbId && loading && (
+      {!missingParams && !invalidType && loading && (
         <Text style={styles.text}>Loading…</Text>
       )}
 
-      {!missingParams && !invalidType && resolvedImdbId && !loading && error && (
+      {!missingParams && !invalidType && !loading && error && (
         <Text style={styles.text}>Error: {error}</Text>
       )}
 
@@ -104,17 +115,17 @@ export default function MovieDetailsView() {
         !error &&
         item && (
           <>
-            <MovieInfo item={item} posterUrl={posterUrl} />
+            <MovieInfo item={item} posterUrl={posterUrl} type={resolvedType as "movie" | "upcoming"} />
+
 
             <Pressable
               onPress={() => onShareMovie(item, resolvedImdbId, resolvedType, isUpcoming)}
             >
               <Text>Share</Text>
             </Pressable>
-
-            <MovieReviews imdbId={resolvedImdbId} />
           </>
         )}
+
 
       <LinearGradient
         colors={[Colors.default.background + "00", Colors.default.background]}

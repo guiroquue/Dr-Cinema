@@ -11,6 +11,7 @@ export type FavoriteMovie = {
   omdb?: { Rated: string }[];
   "release-dateIS"?: string;
   plot?: string;
+  type: "movie" | "upcoming";
 };
 
 

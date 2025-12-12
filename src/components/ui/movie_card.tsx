@@ -5,30 +5,51 @@ import { Colors, Fonts } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 
 import type { Movie } from "@/types/movie";
+import { FavoriteMovie } from "@/store/favorites_slice";
 
 import { formatDateIS } from "@/utils/date_formatter";
 
 interface MovieCardProps {
-  movie: Movie;
+  movie: Movie | FavoriteMovie;
+  type?: "movie" | "upcoming";
   onPress?: () => void;
 }
 
 export function MovieCard({ movie, onPress }: MovieCardProps) {
+  // --- RELEASE DATE ---
   const rawRelease =
     movie["release-dateIS"]?.trim()?.length > 0
       ? movie["release-dateIS"]
       : movie.year;
 
-  const release = rawRelease.includes("-") ? formatDateIS(rawRelease) : rawRelease;
+  const release =
+    typeof rawRelease === "string" && rawRelease.includes("-")
+      ? formatDateIS(rawRelease)
+      : rawRelease ?? "";
 
+  // --- SAFE RATING ---
   const rawRating = movie.omdb?.[0]?.Rated;
-  const rating = rawRating && rawRating !== "N/A" ? rawRating : "N/A";
+  const rating =
+    rawRating && rawRating !== "N/A"
+      ? rawRating
+      : null; // Favorites will have null
 
-  const directors = movie.directors_abridged?.map((d) => d.name).join(", ");
-  const actors = movie.actors_abridged?.map((a) => a.name).slice(0, 3).join(", ");
-  const genres = movie.genres?.map((g) => g.Name ?? g.Name).join(", ");
+  // --- SAFE DIRECTORS ---
+  const directors = movie.directors_abridged
+    ? movie.directors_abridged.map((d) => d.name).join(", ")
+    : null;
 
+  // --- SAFE ACTORS ---
+  const actors = movie.actors_abridged
+    ? movie.actors_abridged.map((a) => a.name).slice(0, 3).join(", ")
+    : null;
 
+  // --- SAFE GENRES ---
+  const genres = movie.genres
+    ? movie.genres.map((g) => g.Name).join(", ")
+    : null;
+
+  // --- ANIMATION ---
   const scale = useRef(new Animated.Value(1)).current;
 
   const animateIn = () => {
@@ -50,8 +71,8 @@ export function MovieCard({ movie, onPress }: MovieCardProps) {
   return (
     <Pressable onPress={onPress} onPressIn={animateIn} onPressOut={animateOut}>
       <Animated.View style={[styles.card, { transform: [{ scale }] }]}>
-
-        <View style={{  }}>
+        {/* POSTER + RATING */}
+        <View>
           <Image source={{ uri: movie.poster }} style={styles.poster} />
 
           {rating && (
@@ -61,43 +82,51 @@ export function MovieCard({ movie, onPress }: MovieCardProps) {
           )}
         </View>
 
+        {/* INFO AREA */}
         <View style={styles.info}>
           <Text style={styles.title} numberOfLines={2}>
             {movie.title}
           </Text>
 
-          <Text style={styles.date}>{release}</Text>
+          {release && (
+            <Text style={styles.date}>{release}</Text>
+          )}
 
-          {directors?.length > 0 && (
+          {directors && (
             <Text style={styles.row}>
               <Text style={styles.label}>Leikstjórn: </Text>
               <Text style={styles.value}>{directors}</Text>
             </Text>
           )}
 
-          {actors?.length > 0 && (
+          {actors && (
             <Text style={styles.row}>
               <Text style={styles.label}>Leikarar: </Text>
               <Text style={styles.value}>{actors}</Text>
             </Text>
           )}
 
-          {genres?.length > 0 && (
+          {genres && (
             <Text style={[styles.row, { marginTop: 6 }]}>
               <Text style={styles.value}>{genres}</Text>
             </Text>
           )}
         </View>
 
+        {/* CHEVRON */}
         <View style={styles.ticketEnd}>
-          <Ionicons name="chevron-forward-outline" size={24} color={Colors.default.secondary} />
+          <Ionicons
+            name="chevron-forward-outline"
+            size={24}
+            color={Colors.default.secondary}
+          />
         </View>
-
       </Animated.View>
     </Pressable>
   );
 }
 
+// STYLES UNCHANGED
 const BG = Colors.default.primary;
 const TEXT = Colors.default.secondary;
 
@@ -189,6 +218,6 @@ const styles = StyleSheet.create({
     borderColor: TEXT,
     paddingLeft: 4,
     marginLeft: 16,
-    borderStyle: "dashed"
+    borderStyle: "dashed",
   },
 });
