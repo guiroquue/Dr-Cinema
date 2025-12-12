@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   blurWrapper: {
-    maxHeight: "70%",
+    maxHeight: "80%",
     flex: 1,
     justifyContent: "center",
     padding: 12,

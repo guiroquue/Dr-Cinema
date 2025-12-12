@@ -68,6 +68,9 @@ export default function MovieInfo({
               <Text style={styles.genreBadgeText}>{item?.year ?? "—"}</Text>
               </View>
               <View style={styles.genreBadge}>
+              <Text style={styles.genreBadgeText}>{omdb?.Country ?? "Land óþekt"}</Text>
+              </View>
+              <View style={styles.genreBadge}>
               <Text style={styles.genreBadgeText}>{omdb?.Runtime ?? "Lengd óþekt"}</Text>
               </View>
               {item.genres?.map((g: any) => (
