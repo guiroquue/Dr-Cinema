@@ -1,5 +1,5 @@
 import React from "react";
-import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View, ScrollView } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import type { Theater } from "@/types/theatre";
 import { useAppSelector } from "@/store/hooks";
@@ -8,7 +8,6 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { WebsiteLink, normalizeWebsite } from "../ui/theater_website_link";
 import { LinearGradient } from "expo-linear-gradient";
 import { MovieCard } from "@/components/ui/movie_card";
-import { ScrollView } from "react-native";
 
 function openMaps(address: string) {
   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
@@ -96,7 +95,10 @@ export default function TheaterDetails() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: Colors.default.background }]}>
-      <View>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: insets.bottom + 48 }}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={styles.title}>{theater.name.replace(",", "") ?? "—"}</Text>
 
         <View style={styles.awesome_stuff}>
@@ -128,30 +130,33 @@ export default function TheaterDetails() {
           {moviesAtTheater.length === 0 ? (
             <Text style={styles.details}>Engar myndir í sýningu.</Text>
           ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.movieList}>
               {moviesAtTheater.map((movie) => (
-                <View key={movie.ids.imdb} style={{ marginRight: 12 }}>
+                <View key={movie.ids.imdb} style={styles.movieItem}>
                   <MovieCard
-                                movie={movie}
-                                onPress={() => {
-                                  const imdbId = movie.ids.imdb;
-                                  if (!imdbId) return;
-                                  router.push({
-                                    pathname: "/movie_details",
-                                    params: { imdbId, type: "movie", theater: movie.showtimes[0]?.cinema?.name  },
-                                  });
-                                }}
-                              />
+                    movie={movie}
+                    onPress={() => {
+                      const imdbId = movie.ids.imdb;
+                      if (!imdbId) return;
+                      router.push({
+                        pathname: "/movie_details",
+                        params: {
+                          imdbId,
+                          type: "movie",
+                          theater: movie.showtimes[0]?.cinema?.name,
+                        },
+                      });
+                    }}
+                  />
                 </View>
               ))}
-            </ScrollView>
+            </View>
           )}
         </View>
-
-      </View>
+      </ScrollView>
       <LinearGradient
         colors={[Colors.default.background + "00", Colors.default.background]}
-        style={{ position: "absolute", bottom: 64, left: 0, right: 0, height: insets.bottom + 32, zIndex: 10 }}
+        style={{ position: "absolute", bottom: 20, left: 0, right: 0, height: insets.bottom + 32, zIndex: 10 }}
         pointerEvents="none"
       />
       <LinearGradient
@@ -206,5 +211,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: Fonts.heading.bold,
     marginBottom: 12,
+  },
+  movieList: {
+    gap: 16,
+  },
+  movieItem: {
+    width: "100%",
   },
 });

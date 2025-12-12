@@ -113,6 +113,34 @@ export default function MovieFilters({ filters, setFilters, onApply, onReset, on
         />
       </View>
 
+      <Text style={styles.label}>Sýningartími</Text>
+      <View style={styles.row}>
+        <TextInput
+          style={[styles.input, styles.half]}
+          placeholder="Frá (HH:mm)"
+          placeholderTextColor={Colors.default.secondary}
+          value={filters.showtime.from}
+          onChangeText={(t) =>
+            setFilters({
+              ...filters,
+              showtime: { ...filters.showtime, from: t },
+            })
+          }
+        />
+        <TextInput
+          style={[styles.input, styles.half]}
+          placeholder="Til (HH:mm)"
+          placeholderTextColor={Colors.default.secondary}
+          value={filters.showtime.to}
+          onChangeText={(t) =>
+            setFilters({
+              ...filters,
+              showtime: { ...filters.showtime, to: t },
+            })
+          }
+        />
+      </View>
+
       {/* Buttons — EXACTLY as you had them */}
       <View style={styles.buttonsRow}>
         <Pressable style={styles.resetBtn} onPress={onReset}>
