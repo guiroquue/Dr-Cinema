@@ -33,17 +33,18 @@ export default function FavoritesView() {
       >
 
         <TapGestureHandler
-          onActivated={() => {
-            router.push({
-              pathname: "/movie_details",
-              params: { imdbId: item.imdbId },
-            });
-          }}
-        >
-          <View>
-            <MovieCard movie={item} />
-          </View>
-        </TapGestureHandler>
+        onActivated={() => {
+          console.log(item);
+          router.push({
+            pathname: "/movie_details",
+            params: { imdbId: item.imdbId, type: item.type },
+          });
+        }}
+      >
+        <View>
+          <MovieCard movie={item} />
+        </View>
+      </TapGestureHandler>
 
         <TouchableOpacity
           onLongPress={drag}
@@ -56,8 +57,8 @@ export default function FavoritesView() {
         >
 
           <Ionicons name="reorder-three-outline" size={32} color={Colors.default.secondary} style={{marginTop: -28, marginBottom: 12}} />
-          
-          
+
+
         </TouchableOpacity>
       </View>
     );

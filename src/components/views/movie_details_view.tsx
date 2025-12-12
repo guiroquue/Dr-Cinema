@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { StyleSheet, Text } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { Colors } from "@/constants/theme";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -17,10 +18,10 @@ import {
 } from "@/store/current_movie_details_slice";
 
 import MovieInfo from "@/components/ui/movie_details/movie_info";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
+  const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
 
   const { imdbId, type } = useLocalSearchParams<{
@@ -31,80 +32,100 @@ export default function MovieDetailsView() {
   const resolvedImdbId = Array.isArray(imdbId) ? imdbId[0] : imdbId;
   const resolvedType = Array.isArray(type) ? type[0] : type;
 
-  const isUpcoming = resolvedType === "upcoming";
-  const isCurrent = resolvedType === "movie";
+  const missingParams = !resolvedImdbId || !resolvedType;
+  const validTypes = ["movie", "upcoming"] as const;
+  const invalidType = resolvedType && !validTypes.includes(resolvedType as any);
 
-  console.log("MovieDetails params:", imdbId, type);
+  // Choose which Redux slice to read from based on type
+  const state =
+    resolvedType === "upcoming"
+      ? useAppSelector((s) => s.movieDetails)
+      : resolvedType === "movie"
+      ? useAppSelector((s) => s.currentMovieDetails)
+      : { item: null, loading: false, error: "Invalid type" };
 
+  const { item, loading, error } = state;
 
-  const upcomingState = useAppSelector((s) => s.movieDetails);
-  const currentState = useAppSelector((s) => s.currentMovieDetails);
-
-  const insets = useSafeAreaInsets();
-
-  const { item, loading, error } = isUpcoming
-    ? upcomingState
-    : isCurrent
-    ? currentState
-    : { item: null, loading: false, error: "Invalid type param" };
-
+  // Fetch on mount and whenever params change
   useEffect(() => {
-    if (!resolvedImdbId || !resolvedType) return;
+    if (missingParams || invalidType) return;
 
-    if (isUpcoming) {
-      dispatch(upcomingLoadMovieDetails({ imdbId: resolvedImdbId }));
-    } else if (isCurrent) {
-      dispatch(loadCurrentMovieDetails({ imdbId: resolvedImdbId }));
+    switch (resolvedType) {
+      case "upcoming":
+        dispatch(upcomingLoadMovieDetails({ imdbId: resolvedImdbId! }));
+        break;
+
+      case "movie":
+        dispatch(loadCurrentMovieDetails({ imdbId: resolvedImdbId! }));
+        break;
     }
 
     return () => {
-      if (isUpcoming) {
-        dispatch(clearUpcomingMovieDetails());
-      } else if (isCurrent) {
-        dispatch(clearCurrentMovieDetails());
+      switch (resolvedType) {
+        case "upcoming":
+          dispatch(clearUpcomingMovieDetails());
+          break;
+        case "movie":
+          dispatch(clearCurrentMovieDetails());
+          break;
       }
     };
-  }, [dispatch, resolvedImdbId, resolvedType, isUpcoming, isCurrent]);
+  }, [resolvedImdbId, resolvedType]);
 
-
-  const posterUrl = useMemo(() => {
-    if (!item) return null;
-    return item.poster || null;
-  }, [item]);
-
-  const missingParams = !resolvedImdbId || !resolvedType;
-  const invalidType = !!resolvedType && !isUpcoming && !isCurrent;
+  // Poster URL extraction (works for all types)
+  const posterUrl = useMemo(() => item?.poster ?? null, [item]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
+      {/* ERRORS / STATES */}
+
       {missingParams && (
         <Text style={styles.text}>Missing imdbId or type route param.</Text>
       )}
 
       {!missingParams && invalidType && (
-        <Text style={styles.text}>Invalid type param (expected "upcoming" or "movie").</Text>
+        <Text style={styles.text}>
+          Invalid type param (expected "movie" or "upcoming").
+        </Text>
       )}
 
-      {!missingParams && !invalidType && resolvedImdbId && loading && (
+      {!missingParams && !invalidType && loading && (
         <Text style={styles.text}>Loading…</Text>
       )}
 
-      {!missingParams && !invalidType && resolvedImdbId && !loading && error && (
+      {!missingParams && !invalidType && !loading && error && (
         <Text style={styles.text}>Error: {error}</Text>
       )}
 
-      {!missingParams && !invalidType && resolvedImdbId && !loading && !error && item && (
-        <MovieInfo item={item} posterUrl={posterUrl} />
-      )}
+      {!missingParams &&
+        !invalidType &&
+        !loading &&
+        !error &&
+        item && <MovieInfo item={item} posterUrl={posterUrl} />}
 
+      {/* GRADIENTS */}
       <LinearGradient
-        colors={[Colors.default.background + "00", Colors.default.background]}
-        style={{ position: "absolute", bottom: 64, left: 0, right: 0, height: insets.bottom + 12, zIndex: 10 }}
+        colors={[theme.background + "00", theme.background]}
+        style={{
+          position: "absolute",
+          bottom: 64,
+          left: 0,
+          right: 0,
+          height: insets.bottom + 12,
+          zIndex: 10,
+        }}
         pointerEvents="none"
       />
       <LinearGradient
-        colors={[Colors.default.background, Colors.default.background + "00"]}
-        style={{ position: "absolute", top: 0, left: 0, right: 0, height: insets.top - 24, zIndex: 10 }}
+        colors={[theme.background, theme.background + "00"]}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: insets.top - 24,
+          zIndex: 10,
+        }}
         pointerEvents="none"
       />
     </SafeAreaView>
