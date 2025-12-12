@@ -6,6 +6,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 import RottenTomatoesIcon from "@/assets/icons/rotten_tomatoes.svg";
 import MovieReviews from "../movie_review";
+import TheaterShowtimes from "./theater_showtimes";
+import { useLocalSearchParams } from "expo-router";
 
 
 export default function MovieInfo({
@@ -18,6 +20,8 @@ export default function MovieInfo({
   type: "movie" | "upcoming";
 }) {
   const omdb = item?.omdb?.[0] ?? {};
+
+  const { theater } = useLocalSearchParams<{ theater?: string }>();
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -81,6 +85,11 @@ export default function MovieInfo({
           </View>
         </View>
       </View>
+
+      <TheaterShowtimes
+        showtimes={item.showtimes}
+        theaterName={theater}
+      />
 
       <View style={styles.section}>
         <Text style={styles.sectionHeader}>Trailers</Text>

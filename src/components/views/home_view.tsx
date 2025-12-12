@@ -45,7 +45,7 @@ export default function CurrentMoviesView() {
 
   const filteredMovies = useMemo(() => {
     return applyMovieFilters(sorted, filters)
-    
+
   }, [sorted, filters]);
 
   // -------------------------------
@@ -149,7 +149,7 @@ export default function CurrentMoviesView() {
                 if (!imdbId) return;
                 router.push({
                   pathname: "/movie_details",
-                  params: { imdbId, type: "movie" },
+                  params: { imdbId, type: "movie", theater: item.showtimes[0]?.cinema?.name  },
                 });
               }}
             />

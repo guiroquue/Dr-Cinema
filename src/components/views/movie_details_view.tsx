@@ -38,12 +38,6 @@ export default function MovieDetailsView() {
   const isUpcoming = resolvedType === "upcoming";
   const isCurrent = resolvedType === "movie";
 
-  console.log("MovieDetails params:", imdbId, type);
-
-  const upcomingState = useAppSelector((s) => s.movieDetails);
-  const currentState = useAppSelector((s) => s.currentMovieDetails);
-
-
   const state =
     resolvedType === "upcoming"
       ? useAppSelector((s) => s.movieDetails)

@@ -7,7 +7,6 @@ export async function fetchMovieByImdb(
   baseUrl?: string,
   token?: string
 ): Promise<Movie> {
-    console.log("Fetching movie by IMDB ID:", imdbId);
   const data = await apiGet(
     `/movies?imdbid=${encodeURIComponent(imdbId)}`,
     baseUrl,
