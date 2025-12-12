@@ -1,12 +1,14 @@
 import React from "react";
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 import type { Theater } from "@/types/theatre";
 import { useAppSelector } from "@/store/hooks";
 import { Colors, Fonts } from "@/constants/theme";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { WebsiteLink, normalizeWebsite } from "../ui/theater_website_link";
 import { LinearGradient } from "expo-linear-gradient";
+import { MovieCard } from "@/components/ui/movie_card";
+import { ScrollView } from "react-native";
 
 function openMaps(address: string) {
   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
@@ -39,6 +41,7 @@ export default function TheaterDetails() {
   const theater = useAppSelector((s) =>
     theaterId ? (s.theaters.byId[theaterId] as Theater | undefined) : undefined
   );
+  const movies = useAppSelector((s) => s.movies.items);
 
   if (!theaterId) {
     return <Text style={styles.msg}>Missing theater id.</Text>;
@@ -56,12 +59,40 @@ export default function TheaterDetails() {
     return <Text style={styles.msg}>No theater found.</Text>;
   }
 
+  if (!Array.isArray(movies)) {
+    return <Text style={styles.msg}>Hleð myndum…</Text>;
+  }
+
   const address = [theater.address, theater.city].filter(Boolean).join(", ") || "—";
   const descriptionRaw = theater.description;
   const description = descriptionRaw ? stripHtml(descriptionRaw) : null;
   const website = (theater.website ?? "").trim();
   const websiteUrl = website ? normalizeWebsite(website) : null;
 
+  // Movies currently playing at this theater (deduplicated by IMDb ID)
+  const moviesAtTheater = Array.from(
+    new Map(
+      movies
+        .filter((movie) =>
+          movie.showtimes?.some(
+            (s) =>
+              s.cinema?.name === theater.name ||
+              s.cinema_name === theater.name
+          )
+        )
+        .map((movie) => {
+          const imdb =
+            movie.ids?.imdb?.startsWith("tt")
+              ? movie.ids.imdb
+              : movie.ids?.imdb
+              ? `tt${movie.ids.imdb}`
+              : undefined;
+
+          return imdb ? [imdb, movie] : null;
+        })
+        .filter(Boolean) as [string, typeof movies[number]][]
+    ).values()
+  );
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: Colors.default.background }]}>
@@ -90,7 +121,33 @@ export default function TheaterDetails() {
         <View style={styles.websiteLink}>
           {websiteUrl && <WebsiteLink url={websiteUrl} label={website} />}
         </View>
-        
+
+        <View style={{ marginTop: 24 }}>
+          <Text style={styles.sectionTitle}>Í sýningu</Text>
+
+          {moviesAtTheater.length === 0 ? (
+            <Text style={styles.details}>Engar myndir í sýningu.</Text>
+          ) : (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {moviesAtTheater.map((movie) => (
+                <View key={movie.ids.imdb} style={{ marginRight: 12 }}>
+                  <MovieCard
+                                movie={movie}
+                                onPress={() => {
+                                  const imdbId = movie.ids.imdb;
+                                  if (!imdbId) return;
+                                  router.push({
+                                    pathname: "/movie_details",
+                                    params: { imdbId, type: "movie", theater: movie.showtimes[0]?.cinema?.name  },
+                                  });
+                                }}
+                              />
+                </View>
+              ))}
+            </ScrollView>
+          )}
+        </View>
+
       </View>
       <LinearGradient
         colors={[Colors.default.background + "00", Colors.default.background]}
@@ -113,17 +170,17 @@ const styles = StyleSheet.create({
     paddingTop: -32,
   },
   msg: { padding: 12 },
-  container: { 
-    padding: 12, 
-    paddingBottom: 24, 
+  container: {
+    padding: 12,
+    paddingBottom: 24,
   },
-  details: { 
-    gap: 10, 
+  details: {
+    gap: 10,
     fontSize: 16,
     fontFamily: Fonts.body.semibold,
   },
-  title: { 
-    fontSize: 36, 
+  title: {
+    fontSize: 36,
     fontFamily: Fonts.heading.black
   },
   description: {
@@ -144,5 +201,10 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.body.semibold,
     color: Colors.default.primary,
     borderRadius: 12,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontFamily: Fonts.heading.bold,
+    marginBottom: 12,
   },
 });

@@ -110,13 +110,6 @@ export default function MovieDetailsView() {
         item && (
           <>
             <MovieInfo item={item} posterUrl={posterUrl} type={resolvedType as "movie" | "upcoming"} />
-
-
-            <Pressable
-              onPress={() => onShareMovie(item, resolvedImdbId, resolvedType, isUpcoming)}
-            >
-              <Text>Share</Text>
-            </Pressable>
           </>
         )}
 
@@ -161,9 +154,5 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-  },
-  shareContainer: {
-    marginHorizontal: 20,
-    marginVertical: 12,
-  },
+  }
 });

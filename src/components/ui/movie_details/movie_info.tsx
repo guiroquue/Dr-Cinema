@@ -1,11 +1,11 @@
-import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
+import { View, Text, Image, ScrollView, StyleSheet, Pressable, Share } from "react-native";
 import { Fonts, Colors } from "@/constants/theme";
 import FavoriteButton from "@/components/ui/movie_details/favorite_button";
 import TrailersList from "@/components/ui/movie_details/trailers_list";
 import { Ionicons } from "@expo/vector-icons";
 
 import RottenTomatoesIcon from "@/assets/icons/rotten_tomatoes.svg";
-import MovieReviews from "../movie_review";
+import MovieReviews from "./movie_review";
 import TheaterShowtimes from "./theater_showtimes";
 import { useLocalSearchParams } from "expo-router";
 
@@ -25,45 +25,58 @@ export default function MovieInfo({
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.section}>
-       <FavoriteButton
-        movie={item}
-        type={type}
-      />
-      </View>
 
       <View style={styles.section}>
         {posterUrl && (
-          <Image source={{ uri: posterUrl }} resizeMode="cover" style={styles.poster} />
+          <View style={styles.posterWrapper}>
+            <Image
+              source={{ uri: posterUrl }}
+              resizeMode="cover"
+              style={styles.poster}
+            />
+
+            <View style={styles.posterActions}>
+              <FavoriteButton movie={item} type={type} />
+              <Pressable
+                onPress={() => {
+                  Share.share({
+                    title: item?.title ?? "Dr. Bíó",
+                    message: item?.title ?? "",
+                  });
+                }}
+                style={({ pressed }) => [
+                  {
+                    width: 44,
+                    height: 44,
+                    borderRadius: 22,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "rgba(0,0,0,0.45)",
+                  },
+                  pressed && { transform: [{ scale: 0.95 }] },
+                ]}
+              >
+                <Ionicons name="share-outline" size={22} color="#fff" />
+              </Pressable>
+            </View>
+          </View>
         )}
 
         <Text style={styles.title}>{item?.title ?? "Óþekktur titill"}</Text>
         <View style={styles.genreBadgeContainer}>
           <View style={styles.genreBadge}>
               <Text style={styles.genreBadgeText}>{item?.year ?? "—"}</Text>
-          </View>
-          {item.genres?.map((g: any) => (
-            <View key={g.ID} style={styles.genreBadge}>
-              <Text style={styles.genreBadgeText}>{g.Name}</Text>
+              </View>
+              <View style={styles.genreBadge}>
+              <Text style={styles.genreBadgeText}>{omdb?.Runtime ?? "Lengd óþekt"}</Text>
+              </View>
+              {item.genres?.map((g: any) => (
+                <View key={g.ID} style={styles.genreBadge}>
+                  <Text style={styles.genreBadgeText}>{g.Name}</Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
-
-        <Text style={styles.bodyText}>{item?.plot ?? "Enginn söguþráður tiltækur."}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.castMain}>{omdb.Actors ?? ""}</Text>
-        <Text style={styles.detailRow}>Leikstjóri: {omdb.Director ?? "N/A"}</Text>
-        <Text style={styles.detailRow}>Handritshöfundar: {omdb.Writer ?? "N/A"}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionHeader}>Upplýsingar</Text>
-
-        <Text style={styles.detailRow}>Lengd: {omdb.Runtime ?? "N/A"}</Text>
-
-        <View style={styles.badgeContainer}>
+            <View style={styles.badgeContainer}>
           <View style={styles.pgBadge}>
             <Text style={styles.pgLogo}>PG</Text>
             <Text style={styles.badgeText}>{omdb.Rated ?? "N/A"}</Text>
@@ -84,6 +97,25 @@ export default function MovieInfo({
             </Text>
           </View>
         </View>
+
+        <Text style={styles.bodyText}>{item?.plot ?? "Enginn söguþráður tiltækur."}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.detailRow}>
+          <Text style={styles.detailLabel}>Leikarar: </Text>
+          <Text style={styles.detailValue}>{omdb.Actors ?? "N/A"}</Text>
+        </Text>
+
+        <Text style={styles.detailRow}>
+          <Text style={styles.detailLabel}>Leikstjóri: </Text>
+          <Text style={styles.detailValue}>{omdb.Director ?? "N/A"}</Text>
+        </Text>
+
+        <Text style={styles.detailRow}>
+          <Text style={styles.detailLabel}>Handritshöfundar: </Text>
+          <Text style={styles.detailValue}>{omdb.Writer ?? "N/A"}</Text>
+        </Text>
       </View>
 
       <TheaterShowtimes
@@ -105,6 +137,7 @@ const purple = "#9b5de5";
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 20,
     paddingBottom: 40,
     paddingHorizontal: 20,
   },
@@ -118,6 +151,21 @@ const styles = StyleSheet.create({
     aspectRatio: 2 / 3,
     borderRadius: 12,
     marginBottom: 14,
+  },
+
+  posterWrapper: {
+    position: "relative",
+  },
+
+  posterActions: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    flexDirection: "row",
+    gap: 12,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    padding: 6,
+    borderRadius: 100,
   },
 
   title: {
@@ -137,19 +185,21 @@ const styles = StyleSheet.create({
   },
 
   bodyText: {
-    fontSize: 14,
+    fontSize: 16,
     lineHeight: 18,
+    marginTop: 18,
   },
 
+  // Text-related styles
   detailRow: {
     fontSize: 16,
     marginBottom: 6,
   },
-
-  castMain: {
-    fontSize: 16,
-    marginBottom: 6,
+  detailLabel: {
     fontFamily: Fonts.body.semibold,
+  },
+  detailValue: {
+    fontFamily: Fonts.body.regular,
   },
 
   /* GENRE BADGES */
@@ -157,7 +207,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginVertical: 10,
+    marginVertical: 4,
   },
 
   genreBadge: {

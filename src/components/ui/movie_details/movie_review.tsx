@@ -4,11 +4,11 @@ import {
   Text,
   View,
   TextInput,
-  TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addReview } from "@/store/reviews_slice";
-import { Colors } from "@/constants/theme";
+import { Colors, Fonts } from "@/constants/theme";
 
 interface MovieReviewsProps {
   imdbId: string;
@@ -44,10 +44,11 @@ export default function MovieReviews({ imdbId }: MovieReviewsProps) {
   const renderStars = (value: number, onPress?: (n: number) => void) => (
     <View style={styles.starsRow}>
       {[1, 2, 3, 4, 5].map((star) => (
-        <TouchableOpacity
+        <Pressable
           key={star}
           disabled={!onPress}
           onPress={() => onPress && onPress(star)}
+          style={({ pressed }) => pressed && { opacity: 0.6 }}
         >
           <Text
             style={[
@@ -57,45 +58,45 @@ export default function MovieReviews({ imdbId }: MovieReviewsProps) {
           >
             ★
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       ))}
     </View>
   );
 
   return (
     <View style={styles.reviewsContainer}>
-      <Text style={styles.reviewsHeader}>Reviews</Text>
+      <Text style={styles.reviewsHeader}>Umsagnir</Text>
 
-      <Text style={styles.label}>Your rating</Text>
+      <Text style={styles.label}>Einkunn þín</Text>
       {renderStars(rating, setRating)}
 
-      <Text style={styles.label}>Your review</Text>
+      <Text style={styles.label}>Umsögn þín</Text>
       <TextInput
         style={styles.input}
         multiline
         value={reviewText}
         onChangeText={setReviewText}
-        placeholder="What did you think about this movie?"
+        placeholder="Hvað fannst þér um þessa mynd?"
         placeholderTextColor="#999"
       />
 
-      <TouchableOpacity
-        style={[
-          styles.button,
-          (!rating || !reviewText.trim() || submitting) &&
-            styles.buttonDisabled,
-        ]}
+      <Pressable
         disabled={!rating || !reviewText.trim() || submitting}
         onPress={handleSubmitReview}
+        style={({ pressed }) => [
+          styles.button,
+          (!rating || !reviewText.trim() || submitting) && styles.buttonDisabled,
+          pressed && { transform: [{ scale: 0.98 }] },
+        ]}
       >
         <Text style={styles.buttonText}>
-          {submitting ? "Submitting…" : "Submit review"}
+          {submitting ? "Sendi…" : "Senda umsögn"}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
 
       {reviews.length === 0 ? (
         <Text style={styles.noReviewsText}>
-          No reviews yet. Be the first!
+          Engar umsagnir ennþá. Vertu fyrstur!
         </Text>
       ) : (
         <View style={{ marginTop: 16 }}>
@@ -116,74 +117,100 @@ export default function MovieReviews({ imdbId }: MovieReviewsProps) {
 
 const styles = StyleSheet.create({
   reviewsContainer: {
-    marginTop: 32,
-    paddingHorizontal: 20,
+    marginTop: 6,
   },
+
   reviewsHeader: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 12,
+    fontSize: 22,
+    fontFamily: Fonts.heading.bold,
+    marginBottom: 16,
+    color: Colors.default.secondary,
   },
+
   label: {
     fontSize: 14,
-    marginTop: 8,
-    marginBottom: 4,
+    fontFamily: Fonts.body.semibold,
+    marginTop: 12,
+    marginBottom: 6,
+    color: Colors.default.secondary,
   },
+
   starsRow: {
     flexDirection: "row",
-    marginBottom: 8,
+    marginBottom: 12,
   },
+
   star: {
-    fontSize: 24,
-    marginRight: 4,
-    color: "#ccc",
+    fontSize: 26,
+    marginRight: 6,
+    color: Colors.default.secondary,
   },
+
   starActive: {
-    color: "#fbbf24",
+    color: "#ffa600ff",
   },
+
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    minHeight: 80,
+    borderWidth: 0.2,
+    borderColor: Colors.default.secondary,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    minHeight: 96,
     textAlignVertical: "top",
-    marginBottom: 8,
+    marginBottom: 12,
+    fontFamily: Fonts.body.regular,
+    fontSize: 14,
+    color: Colors.default.secondary,
+    backgroundColor: Colors.default.primary + "50",
   },
+
   button: {
-    marginTop: 4,
     backgroundColor: Colors.default.action,
-    paddingVertical: 10,
-    borderRadius: 8,
+    paddingVertical: 12,
+    borderRadius: 14,
     alignItems: "center",
+    marginBottom: 16,
   },
+
   buttonDisabled: {
     opacity: 0.5,
+    backgroundColor: Colors.default.action + "70",
   },
+
   buttonText: {
-    color: "#fff",
-    fontWeight: "600",
+    color: Colors.default.primary,
+    fontFamily: Fonts.body.semibold,
+    fontSize: 15,
   },
+
   noReviewsText: {
-    marginTop: 12,
+    marginTop: 8,
     fontSize: 14,
-    color: "#666",
+    fontFamily: Fonts.body.regular,
+    color: Colors.default.secondary,
   },
+
   reviewCard: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
+    backgroundColor: Colors.default.background,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 0.2,
+    borderColor: Colors.default.secondary,
   },
+
   reviewText: {
-    marginTop: 4,
+    marginTop: 6,
     fontSize: 14,
+    fontFamily: Fonts.body.regular,
+    color: Colors.default.secondary,
   },
+
   reviewMeta: {
-    marginTop: 4,
+    marginTop: 6,
     fontSize: 12,
-    color: "#777",
+    fontFamily: Fonts.body.regular,
+    color: Colors.default.secondary,
   },
 });

@@ -85,7 +85,7 @@ export default function TheatersView({ baseUrl, token }: TheatersViewProps) {
       />
       <LinearGradient
         colors={[Colors.default.background, Colors.default.background + "00"]}
-        style={{ position: "absolute", top: 20, left: 0, right: 0, height: insets.top - 26, zIndex: 10 }}
+        style={{ position: "absolute", top: 12, left: 0, right: 0, height: insets.top - 26, zIndex: 10 }}
         pointerEvents="none"
       />
     </SafeAreaView>

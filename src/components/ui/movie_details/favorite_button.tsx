@@ -1,9 +1,10 @@
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addFavorite, removeFavorite } from "@/store/favorites_slice";
 import { saveFavorites } from "@/utils/favorite_movies";
 import type { Movie } from "@/types/movie";
-import { Fonts, Colors } from "@/constants/theme";
+import { Colors } from "@/constants/theme";
 
 type Props = { movie: Movie; type: "movie" | "upcoming" };
 
@@ -42,18 +43,25 @@ export default function FavoriteButton({ movie, type }: Props) {
   return (
     <Pressable
       onPress={handlePress}
-      style={{
-        padding: 12,
-        marginTop: 16,
-        backgroundColor: isFavorite ? Colors.default.secondary : Colors.default.background,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: Colors.default.secondary
-      }}
+      style={({ pressed }) => [
+        {
+          width: 44,
+          height: 44,
+          borderRadius: 22,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: isFavorite
+            ? Colors.default.action
+            : "rgba(0,0,0,0.45)",
+        },
+        pressed && { transform: [{ scale: 0.95 }] },
+      ]}
     >
-      <Text style={{ color: isFavorite ? Colors.default.background : Colors.default.secondary, fontFamily: Fonts.body.semibold }}>
-        {isFavorite ? "Eyða við uppáhalds" : "Bæta við uppáhalds"}
-      </Text>
+      <Ionicons
+        name={isFavorite ? "heart" : "heart-outline"}
+        size={22}
+        color="#fff"
+      />
     </Pressable>
   );
 }
