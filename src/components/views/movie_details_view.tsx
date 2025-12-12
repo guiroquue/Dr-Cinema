@@ -18,6 +18,8 @@ import {
 } from "@/store/current_movie_details_slice";
 
 import MovieInfo from "@/components/ui/movie_details/movie_info";
+import MovieReviews from "@/components/ui/movie_review";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
@@ -32,9 +34,13 @@ export default function MovieDetailsView() {
   const resolvedImdbId = Array.isArray(imdbId) ? imdbId[0] : imdbId;
   const resolvedType = Array.isArray(type) ? type[0] : type;
 
-  const missingParams = !resolvedImdbId || !resolvedType;
-  const validTypes = ["movie", "upcoming"] as const;
-  const invalidType = resolvedType && !validTypes.includes(resolvedType as any);
+  const isUpcoming = resolvedType === "upcoming";
+  const isCurrent = resolvedType === "movie";
+
+  console.log("MovieDetails params:", imdbId, type);
+
+  const upcomingState = useAppSelector((s) => s.movieDetails);
+  const currentState = useAppSelector((s) => s.currentMovieDetails);
 
   // Choose which Redux slice to read from based on type
   const state =
@@ -72,8 +78,13 @@ export default function MovieDetailsView() {
     };
   }, [resolvedImdbId, resolvedType]);
 
-  // Poster URL extraction (works for all types)
-  const posterUrl = useMemo(() => item?.poster ?? null, [item]);
+  const posterUrl = useMemo(() => {
+    if (!item) return null;
+    return item.poster || null;
+  }, [item]);
+
+  const missingParams = !resolvedImdbId || !resolvedType;
+  const invalidType = !!resolvedType && !isUpcoming && !isCurrent;
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
@@ -85,7 +96,7 @@ export default function MovieDetailsView() {
 
       {!missingParams && invalidType && (
         <Text style={styles.text}>
-          Invalid type param (expected "movie" or "upcoming").
+          Invalid type param (expected "upcoming" or "movie").
         </Text>
       )}
 
@@ -99,13 +110,20 @@ export default function MovieDetailsView() {
 
       {!missingParams &&
         !invalidType &&
+        resolvedImdbId &&
         !loading &&
         !error &&
-        item && <MovieInfo item={item} posterUrl={posterUrl} />}
+        item && (
+          <>
+            <MovieInfo item={item} posterUrl={posterUrl} />
+
+            <MovieReviews imdbId={resolvedImdbId} />
+          </>
+        )}
 
       {/* GRADIENTS */}
       <LinearGradient
-        colors={[theme.background + "00", theme.background]}
+        colors={[Colors.default.background + "00", Colors.default.background]}
         style={{
           position: "absolute",
           bottom: 64,
@@ -117,7 +135,7 @@ export default function MovieDetailsView() {
         pointerEvents="none"
       />
       <LinearGradient
-        colors={[theme.background, theme.background + "00"]}
+        colors={[Colors.default.background, Colors.default.background + "00"]}
         style={{
           position: "absolute",
           top: 0,
