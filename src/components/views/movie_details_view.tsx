@@ -19,7 +19,6 @@ import {
 
 import MovieInfo from "@/components/ui/movie_details/movie_info";
 import MovieReviews from "@/components/ui/movie_review";
-import { LinearGradient } from "expo-linear-gradient";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
