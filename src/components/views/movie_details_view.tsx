@@ -18,7 +18,6 @@ import {
 } from "@/store/current_movie_details_slice";
 
 import MovieInfo from "@/components/ui/movie_details/movie_info";
-import MovieReviews from "@/components/ui/movie_review";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
@@ -115,7 +114,7 @@ export default function MovieDetailsView() {
           <>
             <MovieInfo item={item} posterUrl={posterUrl} type={resolvedType as "movie" | "upcoming"} />
 
-            <MovieReviews imdbId={resolvedImdbId} />
+
           </>
         )}
 

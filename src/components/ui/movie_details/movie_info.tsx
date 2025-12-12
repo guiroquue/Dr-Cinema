@@ -5,6 +5,7 @@ import TrailersList from "@/components/ui/movie_details/trailers_list";
 import { Ionicons } from "@expo/vector-icons";
 
 import RottenTomatoesIcon from "@/assets/icons/rotten_tomatoes.svg";
+import MovieReviews from "../movie_review";
 
 
 export default function MovieInfo({
@@ -85,6 +86,8 @@ export default function MovieInfo({
         <Text style={styles.sectionHeader}>Trailers</Text>
         <TrailersList item={item} />
       </View>
+
+      <MovieReviews imdbId={item.ids.imdb} />
     </ScrollView>
   );
 }
