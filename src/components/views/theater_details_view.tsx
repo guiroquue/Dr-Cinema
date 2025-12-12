@@ -2,6 +2,7 @@ import React from "react";
 import { Linking, Pressable, StyleSheet, Text, View, ScrollView } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import type { Theater } from "@/types/theatre";
+import type { Movie, Showtime } from "@/types/movie";
 import { useAppSelector } from "@/store/hooks";
 import { Colors, Fonts } from "@/constants/theme";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -74,9 +75,8 @@ export default function TheaterDetails() {
       movies
         .filter((movie) =>
           movie.showtimes?.some(
-            (s) =>
-              s.cinema?.name === theater.name ||
-              s.cinema_name === theater.name
+            (s: Showtime) =>
+              s.cinema?.name === theater.name
           )
         )
         .map((movie) => {
@@ -143,7 +143,7 @@ export default function TheaterDetails() {
                         params: {
                           imdbId,
                           type: "movie",
-                          theater: movie.showtimes[0]?.cinema?.name,
+                          theater: movie.showtimes![0]?.cinema?.name,
                         },
                       });
                     }}

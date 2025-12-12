@@ -16,7 +16,7 @@ export async function shareFavorites(favorites: FavoriteMovie[]) {
         const dateText = f["release-dateIS"] ? `, Útgáfudagur: ${f["release-dateIS"]}` : "";
         const genreText =
           f.genres && f.genres.length > 0
-            ? `, Tegund: ${f.genres.map((g) => g.Name ?? g.name ?? "Óþekkt").join(", ")}`
+            ? `, Tegund: ${f.genres.map((g) => g.Name ?? "Óþekkt").join(", ")}`
             : "";
         return `${i + 1}. ${f.title}${dateText}${genreText}`;
       })

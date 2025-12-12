@@ -18,7 +18,7 @@ interface MovieCardProps {
 export function MovieCard({ movie, onPress }: MovieCardProps) {
   // --- RELEASE DATE ---
   const rawRelease =
-    movie["release-dateIS"]?.trim()?.length > 0
+    movie["release-dateIS"] && movie["release-dateIS"].trim().length > 0
       ? movie["release-dateIS"]
       : movie.year;
 

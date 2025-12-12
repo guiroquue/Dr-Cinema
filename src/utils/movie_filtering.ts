@@ -1,4 +1,4 @@
-import type { Movie, AbridgedPerson } from "@/types/movie";
+import type { Movie, Showtime, ShowtimeSlot, AbridgedPerson } from "@/types/movie";
 
 export interface MovieFilter {
   title?: string;
@@ -56,7 +56,7 @@ export function applyMovieFilters(movies: Movie[], filters: MovieFilter): Movie[
     if (imdbRating === undefined && (minImdb !== undefined || maxImdb !== undefined)) return false;
 
 
-    const rottenStr = m.omdb[0]?.Ratings?.find(r => r.Source === "Rotten Tomatoes")?.Value;
+    const rottenStr = m.omdb[0]?.Ratings?.find((r: { Source: string; Value: string }) => r.Source === "Rotten Tomatoes")?.Value;
     const rottenRating = rottenStr && !isNaN(Number(rottenStr.replace("%","")))
       ? Number(rottenStr.replace("%",""))
       : undefined;
@@ -94,8 +94,8 @@ export function applyMovieFilters(movies: Movie[], filters: MovieFilter): Movie[
         return false;
       }
 
-      const hasMatchingShowtimeToday = m.showtimes?.some((st) =>
-        st.schedule?.some((slot) => {
+      const hasMatchingShowtimeToday = m.showtimes?.some((st: Showtime) =>
+        st.schedule?.some((slot: ShowtimeSlot) => {
           // Works for "14:00 (EN TAL)" and other formats
           const minutes = toMinutes(slot.time);
           if (minutes === undefined) return false;

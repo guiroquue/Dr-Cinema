@@ -46,6 +46,20 @@ export interface OmdbEntry {
   [key: string]: any; // API includes many fields we don’t need to enumerate
 }
 
+export interface Cinema {
+  id: number;
+  name: string;
+}
+
+export interface ShowtimeSlot {
+  time: string;
+}
+
+export interface Showtime {
+  cinema: Cinema;
+  schedule: ShowtimeSlot[];
+}
+
 export interface Movie {
   _id: string;
   id: number;
@@ -61,4 +75,5 @@ export interface Movie {
   omdb: OmdbEntry[];
   plot: string;
   poster: string;
+  showtimes?: Showtime[];
 }
