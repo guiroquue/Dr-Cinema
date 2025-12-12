@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import RottenTomatoesIcon from "@/assets/icons/rotten_tomatoes.svg";
 
+
 export default function MovieInfo({
   item,
   posterUrl,

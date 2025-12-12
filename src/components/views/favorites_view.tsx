@@ -33,16 +33,20 @@ export default function FavoritesView() {
       >
 
         <TapGestureHandler
-        onActivated={() => {
-          console.log(item);
-          router.push({
-            pathname: "/movie_details",
-            params: { imdbId: item.imdbId, type: item.type },
-          });
-        }}
-      >
+          onActivated={() => {
+            if (!item.imdbId) {
+              console.warn("Favorite item is missing imdbId:", item);
+              return;
+            }
+            const itemType = item.type || "movie"; // default fallback
+            router.push({
+              pathname: "/movie_details",
+              params: { imdbId: item.imdbId, type: itemType },
+            });
+          }}
+        >
         <View>
-          <MovieCard movie={item} />
+          <MovieCard movie={item} type={item.type} />
         </View>
       </TapGestureHandler>
 

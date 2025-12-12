@@ -11,7 +11,7 @@ export default function FavoriteButton({ movie, type }: Props) {
   const dispatch = useAppDispatch();
   const favorites = useAppSelector(s => s.favorites.items);
 
-  const imdbId = movie.ids?.imdb;
+  const imdbId = movie.ids?.imdb || movie.omdb?.[0]?.imdbID;
   const isFavorite = imdbId ? favorites.some(f => f.imdbId === imdbId) : false;
 
   const handlePress = async () => {

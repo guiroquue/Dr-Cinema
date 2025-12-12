@@ -114,7 +114,7 @@ export default function MovieDetailsView() {
         !error &&
         item && (
           <>
-            <MovieInfo item={item} posterUrl={posterUrl} />
+            <MovieInfo item={item} posterUrl={posterUrl} type={resolvedType as "movie" | "upcoming"} />
 
             <MovieReviews imdbId={resolvedImdbId} />
           </>
