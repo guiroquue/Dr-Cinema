@@ -65,7 +65,7 @@ export default function MovieFilters({ filters, setFilters, onApply, onReset, on
       {/* PG Rating */}
       <TextInput
         style={styles.input}
-        placeholder="PG rating (e.g. PG-13)"
+        placeholder="PG rating (e.g. PG, G-13 or R)"
         value={filters.pgRating}
         onChangeText={(t) => setFilters({ ...filters, pgRating: t })}
         placeholderTextColor={Colors.default.secondary}
@@ -117,29 +117,6 @@ export default function MovieFilters({ filters, setFilters, onApply, onReset, on
           value={filters.rotten.max}
           onChangeText={(t) =>
             setFilters({ ...filters, rotten: { ...filters.rotten, max: t } })
-          }
-        />
-      </View>
-
-      {/* Showtime */}
-      <Text style={styles.label}>Showtime</Text>
-      <View style={styles.row}>
-        <TextInput
-          style={[styles.input, styles.half]}
-          placeholder="From"
-          placeholderTextColor={Colors.default.secondary}
-          value={filters.showtime.from}
-          onChangeText={(t) =>
-            setFilters({ ...filters, showtime: { ...filters.showtime, from: t } })
-          }
-        />
-        <TextInput
-          style={[styles.input, styles.half]}
-          placeholder="To"
-          placeholderTextColor={Colors.default.secondary}
-          value={filters.showtime.to}
-          onChangeText={(t) =>
-            setFilters({ ...filters, showtime: { ...filters.showtime, to: t } })
           }
         />
       </View>

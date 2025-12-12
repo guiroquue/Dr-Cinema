@@ -38,13 +38,14 @@ export default function CurrentMoviesView() {
   const loading = useAppSelector((s) => s.movies.loading);
   const error = useAppSelector((s) => s.movies.error);
 
-  const unique = dedupeByImdb(movies); // dedupe first
+  const unique = dedupeByImdb(movies);
   const sorted = sortByReleaseDate(unique);
 
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   const filteredMovies = useMemo(() => {
-    return applyMovieFilters(sorted, filters);
+    return applyMovieFilters(sorted, filters)
+    
   }, [sorted, filters]);
 
   // -------------------------------
@@ -133,6 +134,11 @@ export default function CurrentMoviesView() {
 
       {loading && <Text style={styles.sectionHeader}>Loading…</Text>}
       {!loading && error && <Text style={styles.sectionHeader}>Error: {error}</Text>}
+      {!loading && !error && filteredMovies.length === 0 && (
+        <View style={styles.noResults}>
+          <Text style={styles.noResultsText}>No movies match your filters 😢</Text>
+        </View>
+      )}
 
       {!loading && !error && (
         <SectionList
@@ -211,4 +217,16 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
   },
+  noResults: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 50,
+  },
+  noResultsText: {
+    fontSize: 18,
+    color: Colors.default.secondary,
+    textAlign: "center",
+  }
+
 });
