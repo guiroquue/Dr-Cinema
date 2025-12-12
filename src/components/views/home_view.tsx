@@ -70,7 +70,6 @@ export default function CurrentMoviesView() {
       for (const theater of theaters) {
         if (!map[theater]) map[theater] = [];
 
-        // include movie with just the showtimes for this theater
         const showtimesForTheater = movie.showtimes.filter(
           (s) => ( s.cinema?.name ?? "Óþekkt bíó") === theater
         );
@@ -88,7 +87,6 @@ export default function CurrentMoviesView() {
       data: movies,
     }));
   }, [filteredMovies]);
-  // -------------------------------
 
   useEffect(() => {
     if (movies.length === 0) {
@@ -121,12 +119,11 @@ export default function CurrentMoviesView() {
         </Pressable>
       </Modal>
 
-      {/* GLOBAL FILTER BUTTON */}
       <View style={styles.filterBar}>
         <Pressable onPress={() => setFilterVisible(true)} style={styles.filterIconBtn}>
           <Ionicons name="filter" size={28} color={theme.secondary} />
-          <Text style={{ marginLeft: 6, fontFamily: Fonts.body.semibold, fontSize: 16, color: theme.secondary }}>
-            Filter
+          <Text style={{ marginLeft: 10, fontFamily: Fonts.body.semibold, fontSize: 16, color: theme.secondary }}>
+            Sía
           </Text>
         </Pressable>
       </View>
@@ -194,8 +191,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     backgroundColor: Colors.default.background,
-    borderBottomWidth: 1,
-    borderColor: Colors.default.secondary + "33",
+    borderBottomWidth: 0.2,
+    borderColor: Colors.default.secondary,
   },
   filterIconBtn: { flexDirection: "row", alignItems: "center" },
   modalOverlay: {

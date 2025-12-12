@@ -104,7 +104,7 @@ export default function MovieDetailsView() {
       />
       <LinearGradient
         colors={[Colors.default.background, Colors.default.background + "00"]}
-        style={{ position: "absolute", top: 12, left: 0, right: 0, height: insets.top - 26, zIndex: 10 }}
+        style={{ position: "absolute", top: 0, left: 0, right: 0, height: insets.top - 24, zIndex: 10 }}
         pointerEvents="none"
       />
     </SafeAreaView>
