@@ -9,6 +9,8 @@ import MovieReviews from "./movie_review";
 import TheaterShowtimes from "./theater_showtimes";
 import { useLocalSearchParams } from "expo-router";
 
+import onShareMovie from "@/components/ui/movie_details/share_button";
+
 
 export default function MovieInfo({
   item,
@@ -39,12 +41,14 @@ export default function MovieInfo({
               <FavoriteButton movie={item} type={type} />
               <Pressable
                 onPress={() => {
-                  Share.share({
-                    title: item?.title ?? "Dr. Bíó",
-                    message: item?.title ?? "",
-                  });
+                  onShareMovie(
+                    item,
+                    item?.ids?.imdb || "",
+                    type,
+                    type === "upcoming"
+                  );
                 }}
-                style={({ pressed }) => [
+                  style={({ pressed }) => [
                   {
                     width: 44,
                     height: 44,
