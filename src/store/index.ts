@@ -6,6 +6,8 @@ import movieDetailsReducer from "./upcoming_movie_details_slice";
 import moviesReducer from "./current_movie_slice";
 import TheatersReducer from "@/store/theaters_slice";
 import currentMovieDetailsReducer from "./current_movie_details_slice";
+import reviewsReducer from "./reviews_slice";
+
 export const store = configureStore({
   reducer: {
     favorites: favoritesReducer,
@@ -14,7 +16,7 @@ export const store = configureStore({
     theaters: TheatersReducer,
     movieDetails: movieDetailsReducer,          // upcoming
     currentMovieDetails: currentMovieDetailsReducer,
-    // add more slices here as you build them
+    reviews: reviewsReducer,
   },
 });
 

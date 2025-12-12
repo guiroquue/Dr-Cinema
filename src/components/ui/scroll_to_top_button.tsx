@@ -12,7 +12,6 @@ export function ScrollToTopButton({ onPress, visible }: Props) {
   const fade = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(1)).current;
 
-  // Fade in/out when visible changes
   useEffect(() => {
     Animated.timing(fade, {
       toValue: visible ? 1 : 0,
@@ -69,10 +68,11 @@ export function ScrollToTopButton({ onPress, visible }: Props) {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 112,
+    bottom: 124,
     right: 20,
     zIndex: 50,
   },
+
   button: {
     backgroundColor: Colors.default.secondary,
     flexDirection: "row",
@@ -81,14 +81,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 24,
-
-    // nice shadow
     shadowColor: Colors.default.secondary,
     shadowOpacity: 0.25,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
     elevation: 4,
   },
+
   label: {
     color: Colors.default.primary,
     fontFamily: Fonts.body.semibold,

@@ -1,9 +1,8 @@
 import React from "react";
 import { View, TextInput, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { Colors } from "@/constants/theme";
+import { Colors, Fonts } from "@/constants/theme";
 
-// ✅ Only addition you needed
 export const DEFAULT_FILTERS = {
   title: "",
   actors: "",
@@ -26,57 +25,51 @@ export default function MovieFilters({ filters, setFilters, onApply, onReset, on
   return (
     <ScrollView contentContainerStyle={styles.container}>
 
-      {/* Close */}
       <View style={styles.headerRow}>
-        <Text style={styles.headerText}>Filters</Text>
+        <Text style={styles.headerText}>Síur</Text>
 
         <Pressable onPress={onClose}>
           <Ionicons name="close" size={28} color={Colors.default.secondary} />
         </Pressable>
       </View>
 
-      {/* Title */}
       <TextInput
         style={styles.input}
-        placeholder="Movie title"
+        placeholder="Mynd títill"
         value={filters.title}
         onChangeText={(t) => setFilters({ ...filters, title: t })}
         placeholderTextColor={Colors.default.secondary}
       />
 
-      {/* Actors */}
       <TextInput
         style={styles.input}
-        placeholder="Actor names"
+        placeholder="Nafn leikara"
         value={filters.actors}
         onChangeText={(t) => setFilters({ ...filters, actors: t })}
         placeholderTextColor={Colors.default.secondary}
       />
 
-      {/* Directors */}
       <TextInput
         style={styles.input}
-        placeholder="Director names"
+        placeholder="Nafn leikstróra"
         value={filters.directors}
         onChangeText={(t) => setFilters({ ...filters, directors: t })}
         placeholderTextColor={Colors.default.secondary}
       />
 
-      {/* PG Rating */}
       <TextInput
         style={styles.input}
-        placeholder="PG rating (e.g. PG, G-13 or R)"
+        placeholder="PG rating (e.g. PG, PG-13 or R)"
         value={filters.pgRating}
         onChangeText={(t) => setFilters({ ...filters, pgRating: t })}
         placeholderTextColor={Colors.default.secondary}
       />
 
-      {/* IMDb */}
-      <Text style={styles.label}>IMDb Rating</Text>
+      <Text style={styles.label}>IMDb Einkunn</Text>
       <View style={styles.row}>
         <TextInput
           style={[styles.input, styles.half]}
-          placeholder="Min"
+          placeholder="Lámark"
           placeholderTextColor={Colors.default.secondary}
           keyboardType="numeric"
           value={filters.imdb.min}
@@ -86,7 +79,7 @@ export default function MovieFilters({ filters, setFilters, onApply, onReset, on
         />
         <TextInput
           style={[styles.input, styles.half]}
-          placeholder="Max"
+          placeholder="Hámark"
           placeholderTextColor={Colors.default.secondary}
           keyboardType="numeric"
           value={filters.imdb.max}
@@ -96,12 +89,11 @@ export default function MovieFilters({ filters, setFilters, onApply, onReset, on
         />
       </View>
 
-      {/* Rotten Tomatoes */}
-      <Text style={styles.label}>Rotten Tomatoes</Text>
+      <Text style={styles.label}>Rotten Tómatar</Text>
       <View style={styles.row}>
         <TextInput
           style={[styles.input, styles.half]}
-          placeholder="Min"
+          placeholder="Lámark"
           placeholderTextColor={Colors.default.secondary}
           keyboardType="numeric"
           value={filters.rotten.min}
@@ -111,7 +103,7 @@ export default function MovieFilters({ filters, setFilters, onApply, onReset, on
         />
         <TextInput
           style={[styles.input, styles.half]}
-          placeholder="Max"
+          placeholder="Hámark"
           placeholderTextColor={Colors.default.secondary}
           keyboardType="numeric"
           value={filters.rotten.max}
@@ -124,11 +116,11 @@ export default function MovieFilters({ filters, setFilters, onApply, onReset, on
       {/* Buttons — EXACTLY as you had them */}
       <View style={styles.buttonsRow}>
         <Pressable style={styles.resetBtn} onPress={onReset}>
-          <Text style={styles.resetText}>Reset</Text>
+          <Text style={styles.resetText}>Hreinsa</Text>
         </Pressable>
 
         <Pressable style={styles.applyBtn} onPress={onApply}>
-          <Text style={styles.applyText}>Apply</Text>
+          <Text style={styles.applyText}>Skoða</Text>
         </Pressable>
       </View>
 
@@ -158,14 +150,15 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
+    fontFamily: Fonts.body.semibold,
     marginBottom: 4,
     marginTop: 8,
   },
   input: {
     borderWidth: 0.2,
     padding: 10,
-    borderRadius: 10,
-    fontSize: 16,
+    borderRadius: 8,
+    fontSize: 12,
     marginBottom: 8,
   },
   row: {
