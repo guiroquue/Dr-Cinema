@@ -1,4 +1,4 @@
-import { StyleSheet, View, TouchableOpacity } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Button, Pressable, Text } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist";
 import { GestureHandlerRootView, TapGestureHandler } from "react-native-gesture-handler";
@@ -10,12 +10,15 @@ import { MovieCard } from "@/components/ui/movie_card";
 import { router } from "expo-router";
 import { setFavorites } from "@/store/favorites_slice";
 import { LinearGradient } from "expo-linear-gradient";
+import { shareFavorites } from "@/utils/share_favorites";
 
 export default function FavoritesView() {
   const theme = Colors.default;
   const dispatch = useAppDispatch();
   const favorites = useAppSelector((s) => s.favorites.items);
   const insets = useSafeAreaInsets();
+
+  const handleShare = () => shareFavorites(favorites);
 
   const handleDragEnd = ({ data }: { data: typeof favorites }) => {
     dispatch(setFavorites(data));
@@ -69,28 +72,48 @@ export default function FavoritesView() {
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-        <DraggableFlatList
-          data={favorites}
-          keyExtractor={(item) => item.imdbId}
-          renderItem={renderItem}
-          onDragEnd={handleDragEnd}
-          activationDistance={0}
-        />
+    <>
+      <GestureHandlerRootView style={{ flex: 1 } as any}>
+        <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
+          <DraggableFlatList
+            data={favorites}
+            keyExtractor={(item) => item.imdbId}
+            renderItem={renderItem}
+            onDragEnd={handleDragEnd}
+            activationDistance={0}
+            contentContainerStyle={{ paddingVertical: 24 }}
+          />
 
-        <LinearGradient
-          colors={[Colors.default.background + "00", Colors.default.background]}
-          style={{ position: "absolute", bottom: 64, left: 0, right: 0, height: insets.bottom + 32, zIndex: 10 }}
-          pointerEvents="none"
-        />
-        <LinearGradient
-          colors={[Colors.default.background, Colors.default.background + "00"]}
-          style={{ position: "absolute", top: 12, left: 0, right: 0, height: insets.top + 26, zIndex: 10 }}
-          pointerEvents="none"
-        />
-      </SafeAreaView>
-    </GestureHandlerRootView>
+          <View style={{ paddingHorizontal: 20, backgroundColor: Colors.default.background }}>
+          <Pressable
+            onPress={handleShare}
+            style={{
+              backgroundColor: Colors.default.action,
+              padding: 12,
+              borderRadius: 8,
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "600" }}>
+              Deila uppáhaldsmyndunum mínum
+            </Text>
+          </Pressable>
+        </View>
+
+          <LinearGradient
+            colors={[Colors.default.background + "00", Colors.default.background]}
+            style={{ position: "absolute", bottom: 64, left: 0, right: 0, height: insets.bottom + 32, zIndex: 10 }}
+            pointerEvents="none"
+          />
+          <LinearGradient
+            colors={[Colors.default.background, Colors.default.background + "00"]}
+            style={{ position: "absolute", top: 12, left: 0, right: 0, height: insets.top + 26, zIndex: 10 }}
+            pointerEvents="none"
+          />
+        </SafeAreaView>
+      </GestureHandlerRootView>
+    </>
+    
   );
 }
 
