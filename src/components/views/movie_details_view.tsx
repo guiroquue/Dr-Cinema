@@ -41,7 +41,7 @@ export default function MovieDetailsView() {
   const upcomingState = useAppSelector((s) => s.movieDetails);
   const currentState = useAppSelector((s) => s.currentMovieDetails);
 
-  // Choose which Redux slice to read from based on type
+
   const state =
     resolvedType === "upcoming"
       ? useAppSelector((s) => s.movieDetails)
@@ -51,7 +51,7 @@ export default function MovieDetailsView() {
 
   const { item, loading, error } = state;
 
-  // Fetch on mount and whenever params change
+
   useEffect(() => {
     if (missingParams || invalidType) return;
 
@@ -87,7 +87,6 @@ export default function MovieDetailsView() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-      {/* ERRORS / STATES */}
 
       {missingParams && (
         <Text style={styles.text}>Missing imdbId or type route param.</Text>
@@ -120,7 +119,7 @@ export default function MovieDetailsView() {
           </>
         )}
 
-      {/* GRADIENTS */}
+
       <LinearGradient
         colors={[Colors.default.background + "00", Colors.default.background]}
         style={{

@@ -38,7 +38,7 @@ export default function FavoritesView() {
               console.warn("Favorite item is missing imdbId:", item);
               return;
             }
-            const itemType = item.type || "movie"; // default fallback
+            const itemType = item.type || "movie";
             router.push({
               pathname: "/movie_details",
               params: { imdbId: item.imdbId, type: itemType },

@@ -20,7 +20,6 @@ export default function MovieInfo({
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* FAVORITE */}
       <View style={styles.section}>
        <FavoriteButton
         movie={item}
@@ -28,7 +27,6 @@ export default function MovieInfo({
       />
       </View>
 
-      {/* OVERVIEW */}
       <View style={styles.section}>
         {posterUrl && (
           <Image source={{ uri: posterUrl }} resizeMode="cover" style={styles.poster} />
@@ -49,33 +47,28 @@ export default function MovieInfo({
         <Text style={styles.bodyText}>{item?.plot ?? "Enginn söguþráður tiltækur."}</Text>
       </View>
 
-      {/* CAST & CREW */}
       <View style={styles.section}>
         <Text style={styles.castMain}>{omdb.Actors ?? ""}</Text>
         <Text style={styles.detailRow}>Leikstjóri: {omdb.Director ?? "N/A"}</Text>
         <Text style={styles.detailRow}>Handritshöfundar: {omdb.Writer ?? "N/A"}</Text>
       </View>
 
-      {/* DETAILS */}
       <View style={styles.section}>
         <Text style={styles.sectionHeader}>Upplýsingar</Text>
 
         <Text style={styles.detailRow}>Lengd: {omdb.Runtime ?? "N/A"}</Text>
 
         <View style={styles.badgeContainer}>
-          {/* PG BADGE */}
           <View style={styles.pgBadge}>
             <Text style={styles.pgLogo}>PG</Text>
             <Text style={styles.badgeText}>{omdb.Rated ?? "N/A"}</Text>
           </View>
 
-          {/* IMDb */}
           <View style={styles.imdbBadge}>
             <Ionicons name="star" size={20} color={"#F5C518"} />
             <Text style={styles.badgeText}>{omdb.imdbRating ?? "N/A"}</Text>
           </View>
 
-          {/* Rotten Tomatoes */}
           <View style={styles.tomatoBadge}>
             <RottenTomatoesIcon width={20} height={20} />
             <Text style={styles.badgeText}>
@@ -88,7 +81,6 @@ export default function MovieInfo({
         </View>
       </View>
 
-      {/* TRAILERS */}
       <View style={styles.section}>
         <Text style={styles.sectionHeader}>Trailers</Text>
         <TrailersList item={item} />
@@ -170,7 +162,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 
-  /* RATING BADGES */
   badgeContainer: {
     flexDirection: "row",
     gap: 12,
