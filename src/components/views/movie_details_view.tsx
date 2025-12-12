@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View, Button, Share, Alert, Pressable } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+
 
 import { Colors } from "@/constants/theme";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -18,6 +19,8 @@ import {
 } from "@/store/current_movie_details_slice";
 
 import MovieInfo from "@/components/ui/movie_details/movie_info";
+
+import onShareMovie from "@/components/ui/movie_details/share_button";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
@@ -115,6 +118,11 @@ export default function MovieDetailsView() {
             <MovieInfo item={item} posterUrl={posterUrl} type={resolvedType as "movie" | "upcoming"} />
 
 
+            <Pressable
+              onPress={() => onShareMovie(item, resolvedImdbId, resolvedType, isUpcoming)}
+            >
+              <Text>Share</Text>
+            </Pressable>
           </>
         )}
 
@@ -156,5 +164,12 @@ const styles = StyleSheet.create({
   text: {
     paddingHorizontal: 20,
     marginTop: 20,
+  },
+  content: {
+    flex: 1,
+  },
+  shareContainer: {
+    marginHorizontal: 20,
+    marginVertical: 12,
   },
 });
