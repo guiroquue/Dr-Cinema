@@ -5,9 +5,9 @@ import { saveFavorites } from "@/utils/favorite_movies";
 import type { Movie } from "@/types/movie";
 import { Fonts, Colors } from "@/constants/theme";
 
-type Props = { movie: Movie };
+type Props = { movie: Movie; type: "movie" | "upcoming" };
 
-export default function FavoriteButton({ movie }: Props) {
+export default function FavoriteButton({ movie, type }: Props) {
   const dispatch = useAppDispatch();
   const favorites = useAppSelector(s => s.favorites.items);
 
@@ -32,6 +32,7 @@ export default function FavoriteButton({ movie }: Props) {
         omdb: movie.omdb?.map(o => ({ Rated: o.Rated })) || [],
         "release-dateIS": movie["release-dateIS"],
         plot: movie.plot,
+        type,
       };
       dispatch(addFavorite(fav));
       await saveFavorites([...favorites, fav]);

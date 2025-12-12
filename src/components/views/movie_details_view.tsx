@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { StyleSheet, Text } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { Colors } from "@/constants/theme";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -22,6 +23,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 export default function MovieDetailsView() {
   const theme = Colors.default;
+  const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
 
   const { imdbId, type } = useLocalSearchParams<{
@@ -40,31 +42,41 @@ export default function MovieDetailsView() {
   const upcomingState = useAppSelector((s) => s.movieDetails);
   const currentState = useAppSelector((s) => s.currentMovieDetails);
 
-  const insets = useSafeAreaInsets();
+  // Choose which Redux slice to read from based on type
+  const state =
+    resolvedType === "upcoming"
+      ? useAppSelector((s) => s.movieDetails)
+      : resolvedType === "movie"
+      ? useAppSelector((s) => s.currentMovieDetails)
+      : { item: null, loading: false, error: "Invalid type" };
 
-  const { item, loading, error } = isUpcoming
-    ? upcomingState
-    : isCurrent
-    ? currentState
-    : { item: null, loading: false, error: "Invalid type param" };
+  const { item, loading, error } = state;
 
+  // Fetch on mount and whenever params change
   useEffect(() => {
-    if (!resolvedImdbId || !resolvedType) return;
+    if (missingParams || invalidType) return;
 
-    if (isUpcoming) {
-      dispatch(upcomingLoadMovieDetails({ imdbId: resolvedImdbId }));
-    } else if (isCurrent) {
-      dispatch(loadCurrentMovieDetails({ imdbId: resolvedImdbId }));
+    switch (resolvedType) {
+      case "upcoming":
+        dispatch(upcomingLoadMovieDetails({ imdbId: resolvedImdbId! }));
+        break;
+
+      case "movie":
+        dispatch(loadCurrentMovieDetails({ imdbId: resolvedImdbId! }));
+        break;
     }
 
     return () => {
-      if (isUpcoming) {
-        dispatch(clearUpcomingMovieDetails());
-      } else if (isCurrent) {
-        dispatch(clearCurrentMovieDetails());
+      switch (resolvedType) {
+        case "upcoming":
+          dispatch(clearUpcomingMovieDetails());
+          break;
+        case "movie":
+          dispatch(clearCurrentMovieDetails());
+          break;
       }
     };
-  }, [dispatch, resolvedImdbId, resolvedType, isUpcoming, isCurrent]);
+  }, [resolvedImdbId, resolvedType]);
 
   const posterUrl = useMemo(() => {
     if (!item) return null;
@@ -76,6 +88,8 @@ export default function MovieDetailsView() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
+      {/* ERRORS / STATES */}
+
       {missingParams && (
         <Text style={styles.text}>Missing imdbId or type route param.</Text>
       )}
@@ -86,11 +100,11 @@ export default function MovieDetailsView() {
         </Text>
       )}
 
-      {!missingParams && !invalidType && resolvedImdbId && loading && (
+      {!missingParams && !invalidType && loading && (
         <Text style={styles.text}>Loading…</Text>
       )}
 
-      {!missingParams && !invalidType && resolvedImdbId && !loading && error && (
+      {!missingParams && !invalidType && !loading && error && (
         <Text style={styles.text}>Error: {error}</Text>
       )}
 
@@ -107,6 +121,7 @@ export default function MovieDetailsView() {
           </>
         )}
 
+      {/* GRADIENTS */}
       <LinearGradient
         colors={[Colors.default.background + "00", Colors.default.background]}
         style={{
