@@ -17,6 +17,7 @@ import {
 } from "@/store/current_movie_details_slice";
 
 import MovieInfo from "@/components/ui/movie_details/movie_info";
+import MovieReviews from "@/components/ui/movie_review";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function MovieDetailsView() {
@@ -35,7 +36,6 @@ export default function MovieDetailsView() {
   const isCurrent = resolvedType === "movie";
 
   console.log("MovieDetails params:", imdbId, type);
-
 
   const upcomingState = useAppSelector((s) => s.movieDetails);
   const currentState = useAppSelector((s) => s.currentMovieDetails);
@@ -66,7 +66,6 @@ export default function MovieDetailsView() {
     };
   }, [dispatch, resolvedImdbId, resolvedType, isUpcoming, isCurrent]);
 
-
   const posterUrl = useMemo(() => {
     if (!item) return null;
     return item.poster || null;
@@ -82,7 +81,9 @@ export default function MovieDetailsView() {
       )}
 
       {!missingParams && invalidType && (
-        <Text style={styles.text}>Invalid type param (expected "upcoming" or "movie").</Text>
+        <Text style={styles.text}>
+          Invalid type param (expected "upcoming" or "movie").
+        </Text>
       )}
 
       {!missingParams && !invalidType && resolvedImdbId && loading && (
@@ -93,18 +94,41 @@ export default function MovieDetailsView() {
         <Text style={styles.text}>Error: {error}</Text>
       )}
 
-      {!missingParams && !invalidType && resolvedImdbId && !loading && !error && item && (
-        <MovieInfo item={item} posterUrl={posterUrl} />
-      )}
+      {!missingParams &&
+        !invalidType &&
+        resolvedImdbId &&
+        !loading &&
+        !error &&
+        item && (
+          <>
+            <MovieInfo item={item} posterUrl={posterUrl} />
+
+            <MovieReviews imdbId={resolvedImdbId} />
+          </>
+        )}
 
       <LinearGradient
         colors={[Colors.default.background + "00", Colors.default.background]}
-        style={{ position: "absolute", bottom: 64, left: 0, right: 0, height: insets.bottom + 12, zIndex: 10 }}
+        style={{
+          position: "absolute",
+          bottom: 64,
+          left: 0,
+          right: 0,
+          height: insets.bottom + 12,
+          zIndex: 10,
+        }}
         pointerEvents="none"
       />
       <LinearGradient
         colors={[Colors.default.background, Colors.default.background + "00"]}
-        style={{ position: "absolute", top: 0, left: 0, right: 0, height: insets.top - 24, zIndex: 10 }}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: insets.top - 24,
+          zIndex: 10,
+        }}
         pointerEvents="none"
       />
     </SafeAreaView>
