@@ -17,7 +17,7 @@ import { MovieCard } from "@/components/ui/movie_card";
 import { ScrollToTopButton } from "@/components/ui/scroll_to_top_button";
 import MovieFilters, { DEFAULT_FILTERS } from "@/components/ui/movie_filters";
 
-import type { Movie, Showtime } from "@/types/movie";
+import type { Showtime } from "@/types/movie";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { loadMovies } from "@/store/current_movie_slice";
 

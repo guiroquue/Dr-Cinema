@@ -1,4 +1,4 @@
-import { View, Text, Image, ScrollView, StyleSheet, Pressable, Share } from "react-native";
+import { View, Text, Image, ScrollView, StyleSheet, Pressable } from "react-native";
 import { Fonts, Colors } from "@/constants/theme";
 import FavoriteButton from "@/components/ui/movie_details/favorite_button";
 import TrailersList from "@/components/ui/movie_details/trailers_list";

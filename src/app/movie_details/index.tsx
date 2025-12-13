@@ -1,7 +1,6 @@
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import MovieDetailsView from "@/components/views/movie_details_view";
 import { Pressable, Text } from "react-native";
-import { router } from "expo-router";
 import { Fonts } from "@/constants/theme";
 
 export default function UpcomingScreen() {

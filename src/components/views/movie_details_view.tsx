@@ -1,5 +1,4 @@
-import { useEffect, useMemo } from "react";
-import { StyleSheet, Text, View, Button, Share, Alert, Pressable } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLocalSearchParams } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -25,8 +24,6 @@ export default function MovieDetailsView() {
     posterUrl,
     resolvedImdbId,
     resolvedType,
-    isUpcoming,
-    isCurrent,
     missingParams,
     invalidType,
   } = useMovieDetails({ imdbId, type });
@@ -39,7 +36,7 @@ export default function MovieDetailsView() {
 
       {!missingParams && invalidType && (
         <Text style={styles.text}>
-          Invalid type param (expected "upcoming" or "movie").
+          Invalid type param (expected &quot;upcoming&quot; or &quot;movie&quot;).
         </Text>
       )}
 

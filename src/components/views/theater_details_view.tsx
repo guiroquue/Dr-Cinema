@@ -2,7 +2,7 @@ import React from "react";
 import { Linking, Pressable, StyleSheet, Text, View, ScrollView } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import type { Theater } from "@/types/theatre";
-import type { Movie, Showtime } from "@/types/movie";
+import type { Showtime } from "@/types/movie";
 import { useAppSelector } from "@/store/hooks";
 import { Colors, Fonts } from "@/constants/theme";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";

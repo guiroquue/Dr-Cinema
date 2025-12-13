@@ -35,7 +35,7 @@ export function InitFavorites() {
     loadFavorites().then(saved => {
       dispatch(setFavorites(saved));
     });
-  }, []);
+  }, [dispatch]);
 
   return null;
 }

@@ -10,6 +10,8 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { addReview } from "@/store/reviews_slice";
 import { Colors, Fonts } from "@/constants/theme";
 
+const EMPTY_REVIEWS: any[] = [];
+
 interface MovieReviewsProps {
   imdbId: string;
 }
@@ -18,7 +20,7 @@ export default function MovieReviews({ imdbId }: MovieReviewsProps) {
   const dispatch = useAppDispatch();
 
   const reviews = useAppSelector(
-    (s) => s.reviews.byMovieId[imdbId] ?? []
+    (s) => s.reviews.byMovieId[imdbId] ?? EMPTY_REVIEWS
   );
 
   const [rating, setRating] = useState<number>(0);

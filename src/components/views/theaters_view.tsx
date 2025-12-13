@@ -5,9 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { CinemaList } from "@/components/ui/theater_card";
 import { fetchTheaters } from "@/store/theaters_slice";
 import { Colors, Fonts } from "@/constants/theme";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 type RootState = any;

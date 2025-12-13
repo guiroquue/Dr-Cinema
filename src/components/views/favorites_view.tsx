@@ -1,4 +1,4 @@
-import { StyleSheet, View, TouchableOpacity, Button, Pressable, Text } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Pressable, Text } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import DraggableFlatList, { RenderItemParams } from "react-native-draggable-flatlist";
 import { GestureHandlerRootView, TapGestureHandler } from "react-native-gesture-handler";
@@ -113,7 +113,7 @@ export default function FavoritesView() {
         </SafeAreaView>
       </GestureHandlerRootView>
     </>
-    
+
   );
 }
 
