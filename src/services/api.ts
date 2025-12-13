@@ -1,43 +1,31 @@
+import Constants from "expo-constants";
+
 /**
  * Generic GET helper for all Kvikmyndir API endpoints.
  *
- * Responsibilities:
- *  - Build the final request URL (including token).
- *  - Support overriding baseUrl and token (used mainly in tests).
- *  - Normalize error handling for:
- *      1. HTTP-level failures      (response.ok === false)
- *      2. API-level failures       (JSON contains success: false)
- *  - Return parsed JSON on success.
- *
- * Every endpoint-specific service uses this to keep logic consistent.
+ * Uses header-based auth (x-access-token) to avoid putting tokens in URLs.
  */
+const extra =
+  Constants.expoConfig?.extra ??
+  Constants.manifest2?.extra ??
+  {};
+
 export async function apiGet(
   path: string,
-  baseUrl = process.env.EXPO_PUBLIC_KVIKMYNDIR_BASE_URL,
-  token = process.env.EXPO_PUBLIC_KVIKMYNDIR_API_KEY
+  baseUrl = extra.KVIKMYNDIR_BASE_URL,
+  token = extra.KVIKMYNDIR_API_KEY
 ) {
-
-  // The API format requires `?token=...` even if other query params exist.
-  // We check whether the `path` already includes `?` to append correctly.
-  const url = `${baseUrl}${path}${
-    path.includes("?") ? "&" : "?"
-  }token=${token}`;
-
+  const url = `${baseUrl}${path}`;
   const response = await fetch(url, {
-    headers: { "Content-Type": "application/json" }
+    headers: {
+      "x-access-token": token,
+    },
   });
 
   const data = await response.json();
 
-  // HTTP-level error (network or server response)
-  if (!response.ok) {
-    throw new Error(`HTTP error: ${response.status}`);
-  }
-
-  // API-level error (returned JSON error body)
-  if (data.success === false) {
-    throw new Error(data.message || "API error");
-  }
+  if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+  if (data?.success === false) throw new Error(data.message || "API error");
 
   return data;
 }

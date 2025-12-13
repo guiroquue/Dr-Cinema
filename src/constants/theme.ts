@@ -3,8 +3,9 @@ import { Platform } from 'react-native';
 // Base reusable consistency colors
 export const Colors = {
   default: {
-    text: '#24282E',
-    background: '#EBEAFA',
+    primary: '#FFF9F0',
+    secondary: "#24282E",
+    background: '#F2E5D7',
     action: '#DD1504',
   },
 };
@@ -16,6 +17,7 @@ export const Fonts = {
     medium: 'PlayfairDisplay_500Medium',
     semibold: 'PlayfairDisplay_600SemiBold',
     bold: 'PlayfairDisplay_700Bold',
+    black: 'PlayfairDisplay_900Black',
   },
 
   body: {

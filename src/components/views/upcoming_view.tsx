@@ -1,58 +1,145 @@
-import { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { FlatList, Text, Image, View, StyleSheet } from "react-native";
-import { fetchUpcoming } from "@/src/services/upcoming_service";
-import { Colors } from "@/src/constants/theme";
-import type { Movie } from "@/src/types/movie";
+import { router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+
+import { useRef, useEffect, useState } from "react";
+import { SectionList, StyleSheet, Text } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { Colors, Fonts } from "@/constants/theme";
+
+import { MovieCard } from "@/components/ui/movie_card";
+import { ScrollToTopButton } from "@/components/ui/scroll_to_top_button";
+
+import type { Movie } from "@/types/movie";
+
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { loadUpcoming } from "@/store/upcoming_movies_slice";
+
+import { filterUpcoming } from "@/utils/filter_upcoming";
+import { dedupeByImdb } from "@/utils/movie_dedupe";
+import { sortByReleaseDate } from "@/utils/movie_sort";
+import { groupMoviesByMonth } from "@/utils/movie_group";
 
 export default function UpcomingView() {
-    const theme = Colors.default;
-    const [movies, setMovies] = useState<Movie[]>([]);
+  const listRef = useRef<SectionList<Movie>>(null);
+  const [showTopBtn, setShowTopBtn] = useState(false);
+  const insets = useSafeAreaInsets();
 
-    useEffect(() => {
-        fetchUpcoming()
-        .then((data) => {
-            setMovies(data);
-        })
-        .catch(console.error);
-    }, []);
+  const theme = Colors.default;
+  const dispatch = useAppDispatch();
 
-    return (
-        <SafeAreaView style={[styles.safe, { backgroundColor: theme.background }]}>
-            <FlatList
-                data={movies}
-                keyExtractor={(item) => item._id}
-                renderItem={({ item }) => (
-                <View style={{ marginBottom: 20 }}>
+  const movies = useAppSelector((s) => s.upcoming.items);
+  const loading = useAppSelector((s) => s.upcoming.loading);
+  const error = useAppSelector((s) => s.upcoming.error);
 
-                    {/* Poster */}
-                    <Image
-                    source={{ uri: item.poster }}
-                    style={{ width: 120, height: 180, borderRadius: 8 }}
-                    />
+  const unreleased = filterUpcoming(movies);
+  const unique = dedupeByImdb(unreleased);
+  const sorted = sortByReleaseDate(unique);
+  const sections = groupMoviesByMonth(sorted);
 
-                    {/* Title + Year */}
-                    <Text style={{ fontSize: 18, fontWeight: "600", marginTop: 8 }}>
-                    {item.title} ({item.year})
-                    </Text>
+  useEffect(() => {
+    if (movies.length === 0) {
+      dispatch(loadUpcoming());
+    }
+  }, [dispatch, movies.length]);
 
-                    {/* Optional genres */}
-                    <Text style={{ color: "#777" }}>
-                    {item.genres.map((g) => g.NameEN ?? g.Name).join(", ")}
-                    </Text>
+  function scrollToTop() {
+    listRef.current?.scrollToLocation({
+      sectionIndex: 0,
+      itemIndex: 0,
+      animated: true,
+    });
+  }
 
-                </View>
-                )}
+  return (
+    <SafeAreaView
+      edges={["top", "bottom"]}
+      style={[styles.safe, { backgroundColor: theme.background }]}
+    >
+      {loading && <Text style={styles.sectionHeader}>Loading…</Text>}
+
+      {!loading && error && (
+        <Text style={styles.sectionHeader}>Error: {error}</Text>
+      )}
+
+      {!loading && !error && (
+        <SectionList
+          ref={listRef}
+          sections={sections}
+          renderItem={({ item }) => (
+            <MovieCard
+              movie={item}
+              onPress={() => {
+                const imdbId = item.ids.imdb;
+                if (!imdbId) return;
+                router.push({
+                  pathname: "/movie_details",
+                  params: { imdbId, type: "upcoming" },
+                });
+              }}
             />
-        </SafeAreaView>
-    );
+          )}
+          keyExtractor={(item, index) => `${item._id}-${index}`}
+          renderSectionHeader={({ section }) => (
+            <Text style={styles.sectionHeader}>{section.title}</Text>
+          )}
+          stickySectionHeadersEnabled={false}
+          contentContainerStyle={{
+            paddingHorizontal: 20,
+            paddingBottom: 126,
+          }}
+          onScroll={(e) =>
+            setShowTopBtn(e.nativeEvent.contentOffset.y > 300)
+          }
+          scrollEventThrottle={16}
+        />
+      )}
+
+      <ScrollToTopButton visible={showTopBtn} onPress={scrollToTop} />
+
+      <LinearGradient
+        colors={[theme.background + "00", theme.background]}
+        style={{
+          position: "absolute",
+          bottom: 32,
+          left: 0,
+          right: 0,
+          height: insets.bottom + 120,
+          zIndex: 10,
+        }}
+        pointerEvents="none"
+      />
+
+      <LinearGradient
+        colors={[theme.background, theme.background + "00"]}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: insets.top - 26,
+          zIndex: 10,
+        }}
+        pointerEvents="none"
+      />
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingBottom: 64,
-    paddingTop: -24,
+    paddingTop: -58,
+  },
+
+  sectionHeader: {
+    fontSize: 32,
+    fontFamily: Fonts.heading.black,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+    marginTop: 8,
+    marginBottom: 24,
+    color: Colors.default.secondary,
+    backgroundColor: Colors.default.background,
   },
 });
